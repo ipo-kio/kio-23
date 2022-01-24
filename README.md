@@ -7,3 +7,9 @@
 1. jeep — задача о Джипе
 2. luckytickets — задача о счастливых билетах
 3. stool — задача о табуретке
+
+
+```
+npm install
+npm run compile
+```
