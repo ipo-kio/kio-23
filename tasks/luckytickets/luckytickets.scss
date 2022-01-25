@@ -5,6 +5,7 @@
     background-image: url('luckytickets-resources/red-ticket.png');
     background-size: 100%;
     background-repeat: no-repeat;
+    margin: 10px;
 }
 
 .output-ticket-container {
@@ -15,12 +16,14 @@
     background-size: 100%;
     background-size: 100%;
     background-repeat: no-repeat;
+    margin: 10px;
 }
 
 .input-number {
     margin-top: 50%;
     width: 50%;
     margin-left: 17%;
+    text-align: center;
 }
 
 .output-number {
@@ -28,4 +31,10 @@
     width: 50%;
     margin-left: 17%;
     background-color: white;
+    text-align: center;
+}
+
+.tickets-container {
+    display: flex;
+    padding: 20px;
 }

@@ -5,6 +5,7 @@ export class Luckytickets implements KioTask {
     private settings: KioTaskSettings;
     private kioapi: KioApi;
     private domNode: HTMLElement;
+    private storedInput = '';
 
     constructor(settings: KioTaskSettings) {
         this.settings = settings;
@@ -21,15 +22,30 @@ export class Luckytickets implements KioTask {
         this.domNode = domNode;
 
         console.log('problem level is', this.settings.level);
+        const ticketsContainer = document.createElement('div');
+        ticketsContainer.className = 'tickets-container';
+        this.domNode.appendChild(ticketsContainer);
+
         const inputTicketContainer = document.createElement('div');
         inputTicketContainer.className = 'input-ticket-container';
-        inputTicketContainer.innerHTML = '<input class="input-number">';
-        this.domNode.appendChild(inputTicketContainer);
+        inputTicketContainer.innerHTML = '<input maxlength="6" class="input-number">';
+        ticketsContainer.appendChild(inputTicketContainer);
+        inputTicketContainer.addEventListener('input', (event: InputEvent) => {
+            // Add input validation
+            // Show error message for incorrect input
+            // Pass input to algorithm
+            // Specify max length as variable
+            if (event?.data) {
+                console.log('clicked ', event.data);
+                this.storedInput += event.data;
+                console.log(this.storedInput);
+            }
+        });
 
         const outputTicketContainer = document.createElement('div');
         outputTicketContainer.className = 'output-ticket-container';
         outputTicketContainer.innerHTML = '<input disabled class="output-number">';
-        this.domNode.appendChild(outputTicketContainer);
+        ticketsContainer.appendChild(outputTicketContainer);
     }
 
     parameters(): KioParameterDescription[] {
