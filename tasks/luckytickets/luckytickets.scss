@@ -1,15 +1,31 @@
 .input-ticket-container {
     color: black;
-    height: 100px;
+    height: 200px;
     width: 200px;
     background-image: url('luckytickets-resources/red-ticket.png');
     background-size: 100%;
+    background-repeat: no-repeat;
 }
 
 .output-ticket-container {
     color: black;
-    height: 100px;
+    height: 200px;
     width: 200px;
     background-image: url('luckytickets-resources/blue-ticket.png');
     background-size: 100%;
+    background-size: 100%;
+    background-repeat: no-repeat;
+}
+
+.input-number {
+    margin-top: 50%;
+    width: 50%;
+    margin-left: 17%;
+}
+
+.output-number {
+    margin-top: 50%;
+    width: 50%;
+    margin-left: 17%;
+    background-color: white;
 }
