@@ -21,6 +21,10 @@ export class Luckytickets implements KioTask {
         this.domNode = domNode;
 
         console.log('problem level is', this.settings.level);
+        const ticketContainer = document.createElement('div');
+        ticketContainer.className = 'ticket-container';
+        ticketContainer.innerHTML = 'I AM THE TICKET! Hello world!';
+        this.domNode.appendChild(ticketContainer);
     }
 
     parameters(): KioParameterDescription[] {
