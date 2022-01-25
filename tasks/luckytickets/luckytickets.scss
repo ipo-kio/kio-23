@@ -1,6 +1,15 @@
-.ticket-container {
-    background-color: magenta;
+.input-ticket-container {
     color: black;
     height: 100px;
     width: 200px;
+    background-image: url('luckytickets-resources/red-ticket.png');
+    background-size: 100%;
+}
+
+.output-ticket-container {
+    color: black;
+    height: 100px;
+    width: 200px;
+    background-image: url('luckytickets-resources/blue-ticket.png');
+    background-size: 100%;
 }
