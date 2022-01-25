@@ -147,6 +147,7 @@ function process_html_template(task_html_template, task_name) {
     return task_html_template;
 }
 
+//TODO use copy plugin with transformer parameter
 function add_task_to_config(task_name, config, task_html_template, dist_folder) {
     if (task_name.indexOf('.') >= 0) // skip non directories
         return;
@@ -168,7 +169,8 @@ function add_task_to_config(task_name, config, task_html_template, dist_folder) 
                 {
                     from: '*',
                     to: './' + resources_folder_name,
-                    context: path.resolve(__dirname, 'tasks', task_name, resources_folder_name)
+                    context: path.resolve(__dirname, 'tasks', task_name, resources_folder_name),
+                    noErrorOnMissing: true
                 },
             ]
         })
