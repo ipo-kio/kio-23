@@ -39,12 +39,19 @@ export class Luckytickets implements KioTask {
                 console.log('clicked ', event.data);
                 this.storedInput += event.data;
                 console.log(this.storedInput);
+                if (this.storedInput?.length) {
+                    const outputField = <HTMLInputElement>document.getElementById('output-field');
+                    
+                    if (outputField) {
+                        outputField.value = this.storedInput;
+                    }
+                }
             }
         });
 
         const outputTicketContainer = document.createElement('div');
         outputTicketContainer.className = 'output-ticket-container';
-        outputTicketContainer.innerHTML = '<input disabled class="output-number">';
+        outputTicketContainer.innerHTML = '<input disabled class="output-number" id="output-field">';
         ticketsContainer.appendChild(outputTicketContainer);
     }
 
