@@ -1,24 +1,23 @@
 .input-ticket-container {
     color: black;
-    height: 200px;
-    width: 200px;
     background-image: url('luckytickets-resources/red-ticket.png');
     background-size: 100%;
+    background-position: center;
     background-repeat: no-repeat;
     margin: 10px;
-    flex-shrink: 0;
+    height: 200px;
+    width: 200px;
 }
 
 .output-ticket-container {
     color: black;
-    height: 200px;
-    width: 200px;
     background-image: url('luckytickets-resources/blue-ticket.png');
     background-size: 100%;
-    background-size: 100%;
+    background-position: center;
     background-repeat: no-repeat;
     margin: 10px;
-    flex-shrink: 0;
+    height: 200px;
+    width: 200px;
 }
 
 .input-number {
@@ -36,19 +35,63 @@
     text-align: center;
 }
 
-.tickets-container, .buttons-container {
-    display: flex;
-    padding: 20px;
-    width: 50%;
-    flex-flow: row wrap;
+.tickets-container {
+    display: grid;
+    grid-template-columns: 210px 210px;
+    height: 250px;
 }
-
 .buttons-container {
+    height: 250px;
+    padding: 20px;
+    display: grid;
+    grid-template-columns: 180px 180px;
     button {
         width: 150px;
         height: 50px;
         margin: 10px;
-        flex-shrink: 0;
         border-radius: 5px;
+        &.animation-button {
+            grid-row-start: 1;
+            grid-row-end: 2;
+        }
+        &.step-plus-button {
+            grid-row-start: 2;
+            grid-row-end: 3;
+        }
+        &.step-minus-button {
+            grid-row-start: 3;
+            grid-row-end: 4;
+        }
+        &.instant-result-button {
+            grid-row-start: 2;
+            grid-row-end: 3;
+            grid-column-start: 2;
+            grid-column-end: 2;
+        }
+        &.demo-button {
+            grid-row-start: 3;
+            grid-row-end: 4;
+            grid-column-start: 2;
+            grid-column-end: 2;
+        }
     }
+}
+
+.code-editor {
+    grid-column-start: 2;
+    grid-column-end: 3;
+    grid-row-start: 1;
+    grid-row-end: 3;
+    padding: 10px;
+    textarea {
+        height: 100%;
+        width: -webkit-fill-available;
+        background-color: white;
+    }
+}
+
+.kio-base-box {
+    display: grid;
+    grid-template-columns: 50% 50%;
+    grid-template-rows: 50% 50%;
 }
