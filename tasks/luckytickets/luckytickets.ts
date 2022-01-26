@@ -47,7 +47,7 @@ export class Luckytickets implements KioTask {
 
         const codeEditor = document.createElement('div');
         codeEditor.className = 'code-editor';
-        codeEditor.innerHTML = '<textarea></textarea>';
+        codeEditor.innerHTML = '<textarea id="text-from-editor"></textarea>';
         this.domNode.appendChild(codeEditor);
 
         const buttonsContainer = document.createElement('div');
@@ -88,7 +88,16 @@ export class Luckytickets implements KioTask {
         demoButton.className = 'demo-button';
         buttonsContainer.appendChild(demoButton);
         demoButton.addEventListener('click', (event) => {
-            console.log('clicked demo');
+            const editorElement = <HTMLTextAreaElement>document.getElementById('text-from-editor');
+            if (editorElement?.value) {
+                if (editorElement.value.toUpperCase() === 'ПЕЧАТЬ' && this.storedInput?.length) {
+                    alert(`Your Input IS ${this.storedInput}`);
+                } else if (!this.storedInput.length && editorElement.value.toUpperCase() === 'ПЕЧАТЬ') {
+                    alert('NO INPUT');
+                 } else {
+                    alert('UNKNOWN FUNCTION');
+                }
+            }
         });
 
         const animationButton = document.createElement('button');
