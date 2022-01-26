@@ -63,25 +63,25 @@ export class Luckytickets implements KioTask {
         stepPlusButton.innerText = 'ШАГ +';
         buttonsContainer.appendChild(stepPlusButton);
 
+        const instantResultButton = document.createElement('button');
+        instantResultButton.innerText = 'МГНОВЕННЫЙ РЕЗУЛЬТАТ';
+        instantResultButton.className = 'instant-result-button';
+        buttonsContainer.appendChild(instantResultButton);
+
         const stepMinusButton = document.createElement('button');
         stepMinusButton.innerText = 'ШАГ -';
         stepMinusButton.className = 'step-minus-button';
         buttonsContainer.appendChild(stepMinusButton);
-
-        const animationButton = document.createElement('button');
-        animationButton.innerText = 'АНИМАЦИЯ ПЕРЕБОРА';
-        animationButton.className = 'animation-button';
-        buttonsContainer.appendChild(animationButton);
 
         const demoButton = document.createElement('button');
         demoButton.innerText = 'РЕЖИМ ДЕМОНСТРАЦИИ';
         demoButton.className = 'demo-button';
         buttonsContainer.appendChild(demoButton);
 
-        const instantResultButton = document.createElement('button');
-        instantResultButton.innerText = 'МГНОВЕННЫЙ РЕЗУЛЬТАТ';
-        instantResultButton.className = 'instant-result-button';
-        buttonsContainer.appendChild(instantResultButton);
+        const animationButton = document.createElement('button');
+        animationButton.innerText = 'АНИМАЦИЯ ПЕРЕБОРА';
+        animationButton.className = 'animation-button';
+        buttonsContainer.appendChild(animationButton);
 
     }
 

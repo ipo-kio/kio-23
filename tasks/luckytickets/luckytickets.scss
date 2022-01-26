@@ -39,6 +39,8 @@
 .tickets-container, .buttons-container {
     display: flex;
     padding: 20px;
+    width: 50%;
+    flex-flow: row wrap;
 }
 
 .buttons-container {
