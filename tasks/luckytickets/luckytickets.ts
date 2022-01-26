@@ -36,16 +36,7 @@ export class Luckytickets implements KioTask {
             // Pass input to algorithm
             // Specify max length as variable
             if (event?.data) {
-                console.log('clicked ', event.data);
                 this.storedInput += event.data;
-                console.log(this.storedInput);
-                if (this.storedInput?.length) {
-                    const outputField = <HTMLInputElement>document.getElementById('output-field');
-                    
-                    if (outputField) {
-                        outputField.value = this.storedInput;
-                    }
-                }
             }
         });
 
@@ -62,27 +53,46 @@ export class Luckytickets implements KioTask {
         stepPlusButton.className = 'step-plus-button';
         stepPlusButton.innerText = 'ШАГ +';
         buttonsContainer.appendChild(stepPlusButton);
+        stepPlusButton.addEventListener('click', (event) => {
+            console.log('clicked +');
+        });
 
         const instantResultButton = document.createElement('button');
         instantResultButton.innerText = 'МГНОВЕННЫЙ РЕЗУЛЬТАТ';
         instantResultButton.className = 'instant-result-button';
         buttonsContainer.appendChild(instantResultButton);
+        instantResultButton.addEventListener('click', (event) => {
+            if (this.storedInput?.length) {
+                const outputField = <HTMLInputElement>document.getElementById('output-field');
+                if (outputField) {
+                    outputField.value = this.storedInput;
+                }
+            }
+        });
 
         const stepMinusButton = document.createElement('button');
         stepMinusButton.innerText = 'ШАГ -';
         stepMinusButton.className = 'step-minus-button';
         buttonsContainer.appendChild(stepMinusButton);
+        stepMinusButton.addEventListener('click', (event) => {
+            console.log('clicked -');
+        });
 
         const demoButton = document.createElement('button');
         demoButton.innerText = 'РЕЖИМ ДЕМОНСТРАЦИИ';
         demoButton.className = 'demo-button';
         buttonsContainer.appendChild(demoButton);
+        demoButton.addEventListener('click', (event) => {
+            console.log('clicked demo');
+        });
 
         const animationButton = document.createElement('button');
         animationButton.innerText = 'АНИМАЦИЯ ПЕРЕБОРА';
         animationButton.className = 'animation-button';
         buttonsContainer.appendChild(animationButton);
-
+        animationButton.addEventListener('click', (event) => {
+            console.log('animation button clicked');
+        });
     }
 
     parameters(): KioParameterDescription[] {
