@@ -53,6 +53,36 @@ export class Luckytickets implements KioTask {
         outputTicketContainer.className = 'output-ticket-container';
         outputTicketContainer.innerHTML = '<input disabled class="output-number" id="output-field">';
         ticketsContainer.appendChild(outputTicketContainer);
+
+        const buttonsContainer = document.createElement('div');
+        buttonsContainer.className = 'buttons-container';
+        this.domNode.appendChild(buttonsContainer);
+
+        const stepPlusButton = document.createElement('button');
+        stepPlusButton.className = 'step-plus-button';
+        stepPlusButton.innerText = 'ШАГ +';
+        buttonsContainer.appendChild(stepPlusButton);
+
+        const stepMinusButton = document.createElement('button');
+        stepMinusButton.innerText = 'ШАГ -';
+        stepMinusButton.className = 'step-minus-button';
+        buttonsContainer.appendChild(stepMinusButton);
+
+        const animationButton = document.createElement('button');
+        animationButton.innerText = 'АНИМАЦИЯ ПЕРЕБОРА';
+        animationButton.className = 'animation-button';
+        buttonsContainer.appendChild(animationButton);
+
+        const demoButton = document.createElement('button');
+        demoButton.innerText = 'РЕЖИМ ДЕМОНСТРАЦИИ';
+        demoButton.className = 'demo-button';
+        buttonsContainer.appendChild(demoButton);
+
+        const instantResultButton = document.createElement('button');
+        instantResultButton.innerText = 'МГНОВЕННЫЙ РЕЗУЛЬТАТ';
+        instantResultButton.className = 'instant-result-button';
+        buttonsContainer.appendChild(instantResultButton);
+
     }
 
     parameters(): KioParameterDescription[] {
