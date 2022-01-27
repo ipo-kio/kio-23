@@ -82,23 +82,27 @@
     grid-column-end: 3;
     grid-row-start: 1;
     grid-row-end: 3;
-    padding: 10px;
     display: grid;
     grid-template-columns: 5% 95%;
-    height: 500px;
+    height: 530px;
     overflow: auto;
+    border-bottom: #767676 solid 1px;;
     .code-lines {
         background-color: white;
         font-family: monospace;
         text-align: center;
         padding-top: 3px;
         color: lightgrey;
+        border: #767676 solid 1px;
+        border-right: none;
+        border-bottom: none;
         .line-number {
             display: block;
         }
     }
     textarea {
         width: -webkit-fill-available;
+        border-bottom: none;
         background-color: white;
         outline: none;
         resize: none;
