@@ -51,22 +51,26 @@ export class Luckytickets implements KioTask {
         this.domNode.appendChild(codeEditor);
         const editorElement = <HTMLTextAreaElement>document.getElementById('text-from-editor');
         let linesCount = 1;
+        let linesArray = [1];
         if (editorElement) {
             const ruler = document.getElementById('ruler');
-            ruler.innerHTML = `<div>${linesCount.toString()}</div>`;
+            ruler.innerHTML = `<div class="line-number" id="${linesArray[0].toString()}">${linesArray[0].toString()}</div>`;
         }
-        let linesArray = [1];
         editorElement.addEventListener('keydown', (event) => {
             if (editorElement?.value) {
                 const ruler = document.getElementById('ruler');
                 const lines = editorElement.value.split(/\r*\n/);
                 linesCount = lines.length;
+                console.log(linesCount);
+
                 if (linesArray[linesArray.length - 1] === linesCount) {
                     return;
                 } else if (linesCount < linesArray[linesArray.length - 1]) {
                     ruler.removeChild(ruler.lastChild);
+                    linesArray.pop();
+                    return;
                 }
-                linesArray = Array(linesCount).fill(null).map((_, i) => i+1);
+                linesArray.push(linesCount);
                 const elem = document.createElement("div");
                 elem.setAttribute('id', linesCount.toString());
                 elem.className = 'line-number';

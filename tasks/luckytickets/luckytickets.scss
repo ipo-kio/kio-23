@@ -88,10 +88,11 @@
     grid-template-columns: 10% 90%;
     .code-lines {
         height: 100%;
-        background-color: red;
+        background-color: white;
         font-family: monospace;
         text-align: center;
         padding-top: 3px;
+        color: lightgrey;
         .line-number {
             display: block;
         }
