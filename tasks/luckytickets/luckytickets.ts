@@ -47,8 +47,34 @@ export class Luckytickets implements KioTask {
 
         const codeEditor = document.createElement('div');
         codeEditor.className = 'code-editor';
-        codeEditor.innerHTML = '<textarea id="text-from-editor"></textarea>';
+        codeEditor.innerHTML = '<div class="code-lines" id="ruler"></div><textarea id="text-from-editor"></textarea>';
         this.domNode.appendChild(codeEditor);
+        const editorElement = <HTMLTextAreaElement>document.getElementById('text-from-editor');
+        let linesCount = 1;
+        if (editorElement) {
+            const ruler = document.getElementById('ruler');
+            ruler.innerHTML = `<div>${linesCount.toString()}</div>`;
+        }
+        let linesArray = [1];
+        editorElement.addEventListener('keydown', (event) => {
+            if (editorElement?.value) {
+                const ruler = document.getElementById('ruler');
+                const lines = editorElement.value.split(/\r*\n/);
+                linesCount = lines.length;
+                if (linesArray[linesArray.length - 1] === linesCount) {
+                    return;
+                } else if (linesCount < linesArray[linesArray.length - 1]) {
+                    ruler.removeChild(ruler.lastChild);
+                }
+                linesArray = Array(linesCount).fill(null).map((_, i) => i+1);
+                const elem = document.createElement("div");
+                elem.setAttribute('id', linesCount.toString());
+                elem.className = 'line-number';
+                elem.innerText = linesCount.toString();
+                ruler.appendChild(elem);
+            }
+        });
+
 
         const buttonsContainer = document.createElement('div');
         buttonsContainer.className = 'buttons-container';
@@ -88,7 +114,6 @@ export class Luckytickets implements KioTask {
         demoButton.className = 'demo-button';
         buttonsContainer.appendChild(demoButton);
         demoButton.addEventListener('click', (event) => {
-            const editorElement = <HTMLTextAreaElement>document.getElementById('text-from-editor');
             if (editorElement?.value) {
                 if (editorElement.value.toUpperCase() === 'ПЕЧАТЬ' && this.storedInput?.length) {
                     alert(`Your Input IS ${this.storedInput}`);

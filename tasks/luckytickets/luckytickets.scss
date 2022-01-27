@@ -83,6 +83,19 @@
     grid-row-start: 1;
     grid-row-end: 3;
     padding: 10px;
+    overflow: scroll;
+    display: grid;
+    grid-template-columns: 10% 90%;
+    .code-lines {
+        height: 100%;
+        background-color: red;
+        font-family: monospace;
+        text-align: center;
+        padding-top: 3px;
+        .line-number {
+            display: block;
+        }
+    }
     textarea {
         height: 100%;
         width: -webkit-fill-available;
