@@ -1,117 +1,131 @@
-.input-ticket-container {
-    color: black;
-    background-image: url('luckytickets-resources/red-ticket.png');
-    background-size: 100%;
-    background-position: center;
-    background-repeat: no-repeat;
-    margin: 10px;
-    height: 200px;
-    width: 200px;
-}
-
-.output-ticket-container {
-    color: black;
-    background-image: url('luckytickets-resources/blue-ticket.png');
-    background-size: 100%;
-    background-position: center;
-    background-repeat: no-repeat;
-    margin: 10px;
-    height: 200px;
-    width: 200px;
-}
-
-.input-number {
-    margin-top: 50%;
-    width: 50%;
-    margin-left: 17%;
-    text-align: center;
-}
-
-.output-number {
-    margin-top: 50%;
-    width: 50%;
-    margin-left: 17%;
-    background-color: white;
-    text-align: center;
-}
-
-.tickets-container {
-    display: grid;
-    grid-template-columns: 210px 210px;
-    height: 250px;
-}
-.buttons-container {
-    height: 250px;
-    padding: 20px;
-    display: grid;
-    grid-template-columns: 180px 180px;
-    button {
-        width: 150px;
-        height: 50px;
-        margin: 10px;
-        border-radius: 5px;
-        &.animation-button {
-            grid-row-start: 1;
-            grid-row-end: 2;
-        }
-        &.step-plus-button {
-            grid-row-start: 2;
-            grid-row-end: 3;
-        }
-        &.step-minus-button {
-            grid-row-start: 3;
-            grid-row-end: 4;
-        }
-        &.instant-result-button {
-            grid-row-start: 2;
-            grid-row-end: 3;
-            grid-column-start: 2;
-            grid-column-end: 2;
-        }
-        &.demo-button {
-            grid-row-start: 3;
-            grid-row-end: 4;
-            grid-column-start: 2;
-            grid-column-end: 2;
-        }
-    }
-}
-
-.code-editor {
-    grid-column-start: 2;
-    grid-column-end: 3;
-    grid-row-start: 1;
-    grid-row-end: 3;
-    display: grid;
-    grid-template-columns: 5% 95%;
-    height: 530px;
-    overflow: auto;
-    border-bottom: #767676 solid 1px;;
-    .code-lines {
-        background-color: white;
-        font-family: monospace;
-        text-align: center;
-        padding-top: 3px;
-        color: lightgrey;
-        border: #767676 solid 1px;
-        border-right: none;
-        border-bottom: none;
-        .line-number {
-            display: block;
-        }
-    }
-    textarea {
-        width: -webkit-fill-available;
-        border-bottom: none;
-        background-color: white;
-        outline: none;
-        resize: none;
-        overflow: hidden;
-    }
-}
 
 .kio-base-box {
     display: grid;
     grid-template-columns: 50% 50%;
     grid-template-rows: 50% 50%;
+
+    .tickets-container {
+        display: grid;
+        grid-template-columns: 210px 210px;
+        height: 250px;
+        .input-ticket-container {
+            text-align: center;
+            .input-ticket-title {
+                font-family: Arial, Helvetica, sans-serif;
+                font-size: 20px;
+                margin-top: 10px;
+            }
+            .input-ticket-image {
+                color: black;
+                background-image: url('luckytickets-resources/red-ticket.png');
+                background-size: 100%;
+                background-position: center;
+                background-repeat: no-repeat;
+                margin: 10px;
+                height: 200px;
+                width: 200px;
+                .input-number {
+                    margin-top: 50%;
+                    width: 50%;
+                    margin-left: -10%;
+                    text-align: center;
+                }
+            }
+        }
+        .output-ticket-container {
+            text-align: center;
+            .output-ticket-title {
+                font-family: Arial, Helvetica, sans-serif;
+                font-size: 20px;
+                margin-top: 10px;
+            }
+            .output-ticket-image {
+                color: black;
+                background-image: url('luckytickets-resources/blue-ticket.png');
+                background-size: 100%;
+                background-position: center;
+                background-repeat: no-repeat;
+                margin: 10px;
+                height: 200px;
+                width: 200px;
+            }
+            .output-number {
+                margin-top: 50%;
+                width: 50%;
+                background-color: white;
+                text-align: center;
+                margin-left: -10%;
+            }
+        }
+    }
+    
+    .buttons-container {
+        height: 250px;
+        padding: 20px;
+        display: grid;
+        grid-template-columns: 180px 180px;
+        button {
+            width: 150px;
+            height: 50px;
+            margin: 10px;
+            border-radius: 5px;
+            &.animation-button {
+                grid-row-start: 1;
+                grid-row-end: 2;
+            }
+            &.step-plus-button {
+                grid-row-start: 2;
+                grid-row-end: 3;
+            }
+            &.step-minus-button {
+                grid-row-start: 3;
+                grid-row-end: 4;
+            }
+            &.instant-result-button {
+                grid-row-start: 2;
+                grid-row-end: 3;
+                grid-column-start: 2;
+                grid-column-end: 2;
+            }
+            &.demo-button {
+                grid-row-start: 3;
+                grid-row-end: 4;
+                grid-column-start: 2;
+                grid-column-end: 2;
+            }
+        }
+    }
+    
+    .code-editor {
+        grid-column-start: 2;
+        grid-column-end: 3;
+        grid-row-start: 1;
+        grid-row-end: 3;
+        display: grid;
+        grid-template-columns: 5% 95%;
+        height: 530px;
+        overflow: auto;
+        border-bottom: #767676 solid 1px;;
+        .code-lines {
+            background-color: white;
+            font-family: monospace;
+            text-align: center;
+            padding-top: 3px;
+            color: lightgrey;
+            border: #767676 solid 1px;
+            border-right: none;
+            border-bottom: none;
+            .line-number {
+                display: block;
+            }
+        }
+        textarea {
+            width: -webkit-fill-available;
+            border-bottom: none;
+            background-color: white;
+            outline: none;
+            resize: none;
+            overflow: hidden;
+        }
+    }
 }

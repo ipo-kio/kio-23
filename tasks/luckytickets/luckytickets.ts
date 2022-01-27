@@ -28,9 +28,17 @@ export class Luckytickets implements KioTask {
 
         const inputTicketContainer = document.createElement('div');
         inputTicketContainer.className = 'input-ticket-container';
-        inputTicketContainer.innerHTML = '<input maxlength="6" class="input-number">';
-        ticketsContainer.appendChild(inputTicketContainer);
-        inputTicketContainer.addEventListener('input', (event: InputEvent) => {
+
+        const inputTicketTitle = document.createElement('div');
+        inputTicketTitle.className = 'input-ticket-title';
+        inputTicketTitle.innerText = 'Текущий номер билета';
+        inputTicketContainer.appendChild(inputTicketTitle);
+
+        const inputTicketImage = document.createElement('div');
+        inputTicketImage.className = 'input-ticket-image';
+        inputTicketImage.innerHTML = '<input maxlength="6" class="input-number">';
+        inputTicketContainer.appendChild(inputTicketImage);
+        inputTicketImage.addEventListener('input', (event: InputEvent) => {
             // Add input validation
             // Show error message for incorrect input
             // Pass input to algorithm
@@ -40,9 +48,21 @@ export class Luckytickets implements KioTask {
             }
         });
 
+        ticketsContainer.appendChild(inputTicketContainer);
+
         const outputTicketContainer = document.createElement('div');
         outputTicketContainer.className = 'output-ticket-container';
-        outputTicketContainer.innerHTML = '<input disabled class="output-number" id="output-field">';
+
+        const outputTicketTitle = document.createElement('div');
+        outputTicketTitle.className = 'output-ticket-title';
+        outputTicketTitle.innerText = 'Следующий счастливый билет';
+        outputTicketContainer.appendChild(outputTicketTitle);
+
+        const outputTicketImage = document.createElement('div');
+        outputTicketImage.className = 'output-ticket-image';
+        outputTicketImage.innerHTML = '<input disabled class="output-number" id="output-field">';
+        outputTicketContainer.appendChild(outputTicketImage);
+
         ticketsContainer.appendChild(outputTicketContainer);
 
         const codeEditor = document.createElement('div');
