@@ -83,11 +83,11 @@
     grid-row-start: 1;
     grid-row-end: 3;
     padding: 10px;
-    overflow: scroll;
     display: grid;
-    grid-template-columns: 10% 90%;
+    grid-template-columns: 5% 95%;
+    height: 500px;
+    overflow: auto;
     .code-lines {
-        height: 100%;
         background-color: white;
         font-family: monospace;
         text-align: center;
@@ -98,9 +98,11 @@
         }
     }
     textarea {
-        height: 100%;
         width: -webkit-fill-available;
         background-color: white;
+        outline: none;
+        resize: none;
+        overflow: hidden;
     }
 }
 
