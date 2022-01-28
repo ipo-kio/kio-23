@@ -1,11 +1,20 @@
 import './luckytickets.scss'
 import {KioApi, KioTask, KioParameterDescription, KioResourceDescription, KioTaskSettings} from "../KioApi";
 
+enum OperatorsList {
+    IF = 'ЕСЛИ',
+    THEN = 'ТО',
+    ELSE = 'ИНАЧЕ',
+    AND = 'И'
+}
+
 export class Luckytickets implements KioTask {
     private settings: KioTaskSettings;
     private kioapi: KioApi;
     private domNode: HTMLElement;
     private storedInput = '';
+    private linesCount = 1;
+    private linesArray = [1];
 
     constructor(settings: KioTaskSettings) {
         this.settings = settings;
@@ -77,31 +86,17 @@ export class Luckytickets implements KioTask {
         editorHeader.appendChild(infoIcon);
 
         const editorElement = <HTMLTextAreaElement>document.getElementById('text-from-editor');
-        let linesCount = 1;
-        let linesArray = [1];
+        
         if (editorElement) {
             const ruler = document.getElementById('ruler');
-            ruler.innerHTML = `<div class="line-number" id="${linesArray[0].toString()}">${linesArray[0].toString()}</div>`;
+            ruler.innerHTML = `<div class="line-number" id="${this.linesArray[0].toString()}">${this.linesArray[0].toString()}</div>`;
         }
         editorElement.addEventListener('keydown', (event) => {
             if (editorElement?.value) {
-                const ruler = document.getElementById('ruler');
-                const lines = editorElement.value.split(/\r*\n/);
-                linesCount = lines.length;
-
-                if (linesArray[linesArray.length - 1] === linesCount) {
-                    return;
-                } else if (linesCount < linesArray[linesArray.length - 1]) {
-                    ruler.removeChild(ruler.lastChild);
-                    linesArray.pop();
-                    return;
-                }
-                linesArray.push(linesCount);
-                const elem = document.createElement("div");
-                elem.setAttribute('id', linesCount.toString());
-                elem.className = 'line-number';
-                elem.innerText = linesCount.toString();
-                ruler.appendChild(elem);
+                this.updateRuler(editorElement.value);
+                const rawDataArray = this.decomposeExpression(event, editorElement.value);
+                const jsFunctionString = this.constructJSFunction(rawDataArray);
+                this.callJSFunction(jsFunctionString);
             }
         });
 
@@ -162,6 +157,41 @@ export class Luckytickets implements KioTask {
         animationButton.addEventListener('click', (event) => {
             console.log('animation button clicked');
         });
+    }
+
+    private updateRuler(value: string): void {
+        const ruler = document.getElementById('ruler');
+        const lines = value.split(/\r*\n/);
+        this.linesCount = lines.length;
+
+        if (this.linesArray[this.linesArray.length - 1] === this.linesCount) {
+            return;
+        } else if (this.linesCount < this.linesArray[this.linesArray.length - 1]) {
+            ruler.removeChild(ruler.lastChild);
+            this.linesArray.pop();
+            return;
+        }
+        this.linesArray.push(this.linesCount);
+        const elem = document.createElement("div");
+        elem.setAttribute('id', this.linesCount.toString());
+        elem.className = 'line-number';
+        elem.innerText = this.linesCount.toString();
+        ruler.appendChild(elem);
+    }
+
+    private decomposeExpression(event: KeyboardEvent, editorValue: string): string[] {
+        console.log(event);
+        const codeLines = editorValue.split(/\r*\n/);
+        console.log(codeLines);
+        return codeLines;
+    }
+
+    private constructJSFunction(rawDataArray: string[]): string {
+        return rawDataArray.join();
+    }
+
+    private callJSFunction(jsString: string): void {
+
     }
 
     parameters(): KioParameterDescription[] {
