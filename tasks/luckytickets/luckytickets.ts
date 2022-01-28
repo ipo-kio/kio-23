@@ -5,7 +5,16 @@ enum OperatorsList {
     IF = 'ЕСЛИ',
     THEN = 'ТО',
     ELSE = 'ИНАЧЕ',
-    AND = 'И'
+    AND = 'И',
+    POW = '^',
+    MULT = '*',
+    LT = '<',
+    LTE = '<=',
+    MT = '>',
+    MTE = '>=',
+    PLUS = '+',
+    MINUS = '-',
+    DIVISION = '/'
 }
 
 export class Luckytickets implements KioTask {
@@ -45,7 +54,7 @@ export class Luckytickets implements KioTask {
 
         const inputTicketImage = document.createElement('div');
         inputTicketImage.className = 'input-ticket-image';
-        inputTicketImage.innerHTML = '<input maxlength="6" class="input-number">';
+        inputTicketImage.innerHTML = '<input maxlength="6" class="input-number" placeholder="abcdef">';
         inputTicketContainer.appendChild(inputTicketImage);
         inputTicketImage.addEventListener('input', (event: InputEvent) => {
             // Add input validation
@@ -69,7 +78,7 @@ export class Luckytickets implements KioTask {
 
         const outputTicketImage = document.createElement('div');
         outputTicketImage.className = 'output-ticket-image';
-        outputTicketImage.innerHTML = '<input disabled class="output-number" id="output-field">';
+        outputTicketImage.innerHTML = '<input disabled class="output-number" id="output-field" placeholder="xyzuvw">';
         outputTicketContainer.appendChild(outputTicketImage);
 
         ticketsContainer.appendChild(outputTicketContainer);
