@@ -216,20 +216,26 @@ export class Luckytickets implements KioTask {
             console.log(lineTokens);
             const interpretedLines: string[] = [];
             lineTokens.forEach((token, index, lineTokens) => {
-                if (token === OperatorsList.IF) {
-                    interpretedLines.push('IF(');
+
+                if (lineTokens.indexOf(OperatorsList.IF) !== -1) {
+                    if (token === OperatorsList.IF) {
+                        interpretedLines.push('IF(');
+                    } else if (index === lineTokens.length - 1) {
+                        interpretedLines.push(token + ') {');
+                    } else if (token === OperatorsList.EQUALS) {
+                        interpretedLines.push(')===(');
+                    } else if (token.indexOf(OperatorsList.POW) !== -1) {
+                        interpretedLines.push(token.replace(OperatorsList.POW, '**'));
+                        if (index === lineTokens.length - 1) {
+                            interpretedLines.push(') {');
+                        }
+                    } else {
+                        interpretedLines.push(token);
+                    }
                 } else if (token.indexOf(OperatorsList.POW) !== -1) {
                     interpretedLines.push(token.replace(OperatorsList.POW, '**'));
                     if (index === lineTokens.length - 1) {
                         interpretedLines.push(') {');
-                    }
-                } else if (lineTokens.indexOf(OperatorsList.IF) !== -1) {
-                    if (index === lineTokens.length - 1) {
-                        interpretedLines.push(token + ') {');
-                    } else if (token === OperatorsList.EQUALS) {
-                        interpretedLines.push(')===(');
-                    } else {
-                        interpretedLines.push(token);
                     }
                 } else {
                     interpretedLines.push(token);
