@@ -17,6 +17,14 @@ enum OperatorsList {
     DIVISION = '/'
 }
 
+// interface TokenTypes {
+//     numeric: number;
+//     identifier: string;
+//     arithmetic: ArithmeticOperator;
+//     logical:
+// }
+
+// interface ArithmeticOperator: '+'
 export class Luckytickets implements KioTask {
     private settings: KioTaskSettings;
     private kioapi: KioApi;
@@ -103,9 +111,6 @@ export class Luckytickets implements KioTask {
         editorElement.addEventListener('keydown', (event) => {
             if (editorElement?.value) {
                 this.updateRuler(editorElement.value);
-                const rawDataArray = this.decomposeExpression(event, editorElement.value);
-                const jsFunctionString = this.constructJSFunction(rawDataArray);
-                this.callJSFunction(jsFunctionString);
             }
         });
 
@@ -149,13 +154,17 @@ export class Luckytickets implements KioTask {
         buttonsContainer.appendChild(demoButton);
         demoButton.addEventListener('click', (event) => {
             if (editorElement?.value) {
-                if (editorElement.value.toUpperCase() === 'ПЕЧАТЬ' && this.storedInput?.length) {
-                    alert(`Your Input IS ${this.storedInput}`);
-                } else if (!this.storedInput.length && editorElement.value.toUpperCase() === 'ПЕЧАТЬ') {
-                    alert('NO INPUT');
-                 } else {
-                    alert('UNKNOWN FUNCTION');
-                }
+                // if (editorElement.value.toUpperCase() === 'ПЕЧАТЬ' && this.storedInput?.length) {
+                //     alert(`Your Input IS ${this.storedInput}`);
+                // } else if (!this.storedInput.length && editorElement.value.toUpperCase() === 'ПЕЧАТЬ') {
+                //     alert('NO INPUT');
+                //  } else {
+                //     alert('UNKNOWN FUNCTION');
+                // }
+                const rawDataArray = this.decomposeExpression(editorElement.value);
+                const jsFunctionString = this.constructJSFunction(rawDataArray);
+                console.log('Conatenated string', jsFunctionString);
+                this.callJSFunction(jsFunctionString);
             }
         });
 
@@ -188,15 +197,24 @@ export class Luckytickets implements KioTask {
         ruler.appendChild(elem);
     }
 
-    private decomposeExpression(event: KeyboardEvent, editorValue: string): string[] {
-        console.log(event);
+    private decomposeExpression(editorValue: string): string[] {
         const codeLines = editorValue.split(/\r*\n/);
         console.log(codeLines);
         return codeLines;
     }
 
     private constructJSFunction(rawDataArray: string[]): string {
-        return rawDataArray.join();
+        const processedData = this.processRawData(rawDataArray);
+        return processedData.join('');
+    }
+
+    private processRawData(rawDataArray: string[]): string[] {
+        const processedData: string[] = [];
+        rawDataArray.forEach((codeLine) => {
+            const lineTokens = codeLine.split(' ').join('');
+            processedData.push(lineTokens);
+        });
+        return processedData;
     }
 
     private callJSFunction(jsString: string): void {
