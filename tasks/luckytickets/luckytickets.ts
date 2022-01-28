@@ -68,7 +68,14 @@ export class Luckytickets implements KioTask {
         const codeEditor = document.createElement('div');
         codeEditor.className = 'code-editor';
         codeEditor.innerHTML = '<div class="code-editor-header" id="code-editor-header-id"></div><div class="code-lines" id="ruler"></div><textarea id="text-from-editor"></textarea>';
+
         this.domNode.appendChild(codeEditor);
+
+        const infoIcon = document.createElement('div');
+        infoIcon.className = 'info-icon';
+        const editorHeader = document.getElementById('code-editor-header-id');
+        editorHeader.appendChild(infoIcon);
+
         const editorElement = <HTMLTextAreaElement>document.getElementById('text-from-editor');
         let linesCount = 1;
         let linesArray = [1];

@@ -95,7 +95,7 @@
             }
         }
     }
-    
+
     .code-editor {
         grid-column-start: 2;
         grid-column-end: 3;
@@ -117,7 +117,23 @@
             z-index: 100;
             border: #767676 solid 1px;
             background-color: white;
-            color: royalblue;
+            display: flex;
+            justify-content: end;
+            .info-icon {
+                background-image: url('luckytickets-resources/info-icon.svg');
+                background-size: 100%;
+                background-position: center;
+                background-repeat: no-repeat;
+                height: 18px;
+                width: 18px;
+                margin: 1px;
+                margin-right: 5px;
+                cursor: pointer;
+                filter: opacity(0.5);
+                &:hover {
+                    filter: opacity(1);
+                }
+            }
         }
         .code-lines {
             margin-top: 20px;
