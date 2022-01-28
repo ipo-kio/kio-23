@@ -164,7 +164,7 @@ export class Luckytickets implements KioTask {
                 // }
                 const rawDataArray = this.decomposeExpression(editorElement.value);
                 const jsFunctionString = this.constructJSFunction(rawDataArray);
-                console.log(jsFunctionString);
+                console.log('\n','\n','\n',jsFunctionString);
                 this.callJSFunction(jsFunctionString);
             }
         });
