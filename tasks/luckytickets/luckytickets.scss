@@ -103,10 +103,28 @@
         grid-row-end: 3;
         display: grid;
         grid-template-columns: 5% 95%;
+        // grid-template-rows: 5% 95%;
         height: 530px;
         overflow: auto;
-        border-bottom: #767676 solid 1px;;
+        border-bottom: #767676 solid 1px;
+        .code-editor-header {
+            background: red;
+            grid-column-start: 1;
+            grid-column-end: 3;
+            grid-row-start: 1;
+            grid-row-end: 2;
+            height: 20px;
+            z-index: 100;
+            border: #767676 solid 1px;
+            background-color: white;
+            color: royalblue;
+        }
         .code-lines {
+            margin-top: 20px;
+            grid-column-start: 1;
+            grid-column-end: 2;
+            grid-row-start: 1;
+            grid-row-end: 3;
             background-color: white;
             font-family: monospace;
             text-align: center;
@@ -120,6 +138,11 @@
             }
         }
         textarea {
+            margin-top: 20px;
+            grid-column-start: 2;
+            grid-column-end: 3;
+            grid-row-start: 1;
+            grid-row-end: 3;
             width: -webkit-fill-available;
             border-bottom: none;
             background-color: white;
