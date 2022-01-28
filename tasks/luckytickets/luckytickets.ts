@@ -88,7 +88,6 @@ export class Luckytickets implements KioTask {
                 const ruler = document.getElementById('ruler');
                 const lines = editorElement.value.split(/\r*\n/);
                 linesCount = lines.length;
-                console.log(linesCount);
 
                 if (linesArray[linesArray.length - 1] === linesCount) {
                     return;
