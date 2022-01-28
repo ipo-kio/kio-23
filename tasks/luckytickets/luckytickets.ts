@@ -164,7 +164,7 @@ export class Luckytickets implements KioTask {
                 // }
                 const rawDataArray = this.decomposeExpression(editorElement.value);
                 const jsFunctionString = this.constructJSFunction(rawDataArray);
-                console.log('Conatenated string', jsFunctionString);
+                console.log(jsFunctionString);
                 this.callJSFunction(jsFunctionString);
             }
         });
@@ -200,7 +200,6 @@ export class Luckytickets implements KioTask {
 
     private decomposeExpression(editorValue: string): string[] {
         const codeLines = editorValue.split(/\r*\n/);
-        console.log(codeLines);
         return codeLines;
     }
 
@@ -213,21 +212,53 @@ export class Luckytickets implements KioTask {
         const processedData: string[] = [];
         rawDataArray.forEach((codeLine) => {
             const lineTokens = codeLine.split(' ');
-            console.log(lineTokens);
             const interpretedLines: string[] = [];
             lineTokens.forEach((token, index, lineTokens) => {
 
                 if (lineTokens.indexOf(OperatorsList.IF) !== -1) {
                     if (token === OperatorsList.IF) {
-                        interpretedLines.push('IF(');
+                        interpretedLines.push('if(');
                     } else if (index === lineTokens.length - 1) {
-                        interpretedLines.push(token + ') {');
+                        if (token.indexOf(OperatorsList.POW) !== -1) {
+                            interpretedLines.push(token.replace(OperatorsList.POW, '**'));
+                            interpretedLines.push(')');
+                        } else {
+                            interpretedLines.push(token + ')');
+                        }
                     } else if (token === OperatorsList.EQUALS) {
                         interpretedLines.push(')===(');
                     } else if (token.indexOf(OperatorsList.POW) !== -1) {
                         interpretedLines.push(token.replace(OperatorsList.POW, '**'));
+                    } else {
+                        interpretedLines.push(token);
+                    }
+                } else if (lineTokens.indexOf(OperatorsList.THEN) !== -1) {
+                    if (token === OperatorsList.THEN) {
+                        interpretedLines.push('{');
+                    } else if (index === lineTokens.length - 1) {
+                        if (token.indexOf(OperatorsList.POW) !== -1) {
+                            interpretedLines.push(token.replace(OperatorsList.POW, '**'));
+                            interpretedLines.push('}');
+                        } else {
+                            interpretedLines.push(token + '}');
+                        }
+                    } else if (token.indexOf(OperatorsList.POW) !== -1) {
+                        interpretedLines.push(token.replace(OperatorsList.POW, '**'));
                         if (index === lineTokens.length - 1) {
-                            interpretedLines.push(') {');
+                            interpretedLines.push(')');
+                        }
+                    } else {
+                        interpretedLines.push(token);
+                    }
+                } else if (lineTokens.indexOf(OperatorsList.ELSE) !== -1) {
+                    if (token === OperatorsList.ELSE) {
+                        interpretedLines.push('else{');
+                    } else if (index === lineTokens.length - 1) {
+                        interpretedLines.push(token + '}');
+                    } else if (token.indexOf(OperatorsList.POW) !== -1) {
+                        interpretedLines.push(token.replace(OperatorsList.POW, '**'));
+                        if (index === lineTokens.length - 1) {
+                            interpretedLines.push(')');
                         }
                     } else {
                         interpretedLines.push(token);
@@ -235,7 +266,7 @@ export class Luckytickets implements KioTask {
                 } else if (token.indexOf(OperatorsList.POW) !== -1) {
                     interpretedLines.push(token.replace(OperatorsList.POW, '**'));
                     if (index === lineTokens.length - 1) {
-                        interpretedLines.push(') {');
+                        interpretedLines.push(')');
                     }
                 } else {
                     interpretedLines.push(token);
