@@ -6,26 +6,25 @@ enum OperatorsList {
     THEN = 'ТО',
     ELSE = 'ИНАЧЕ',
     AND = 'И',
-    POW = '^',
-    MULT = '*',
     LT = '<',
     LTE = '<=',
     GT = '>',
     GTE = '>=',
+    EQUALS = '=',
     PLUS = '+',
     MINUS = '-',
+    MULT = '*',
     DIVISION = '/',
-    EQUALS = '='
+    POW = '^'
 }
 
-type ArithmeticOperator = 'plus' | 'minus' | 'mult' | 'division' | 'power' | 'radical';
-type MathOperation = 'SUM' | 'SUBTRACTION' | 'MULTIPLY' | ' DIVIDE' | 'EXP' | 'SQRT';
+type ArithmeticOperator = 'PLUS' | 'MINUS' | 'MULT' | 'DIVISION' | 'POWER' | 'RADICAL';
+type MathOperation = 'SUM' | 'SUBTR' | 'MULT' | ' DIV' | 'EXP' | 'SQRT';
 type Comparator = 'EQUALS' | 'LT' | 'LTE' | 'GT' | 'GTE';
 type Conditionals = 'IF' | 'THEN' | 'ELSE';
 
 interface BasicToken {
-    operation: MathOperation;
-    operator: ArithmeticOperator;
+    operation: MathOperation | string;
     leftOperand: number | string;
     rightOperand: number | string;
 }
@@ -35,7 +34,7 @@ interface RawCodeLine {
     expression: string;
 }
 
-interface ComparatorOperands {
+interface ComparatorOperand {
     comparator: Comparator | string;
     leftComparable: string;
     rightComparable: string;
@@ -240,6 +239,10 @@ export class Luckytickets implements KioTask {
             console.log('Code without condition' , codeWithoutCondition);
             const codeWithoutComparator = this.extractComparator(codeWithoutCondition);
             console.log('Code without comparator', codeWithoutComparator);
+            const decomposedLeftComparable = this.extractMathOperator(codeWithoutComparator.leftComparable);
+            console.log('Left Operations', decomposedLeftComparable);
+            const decomposedRightComparable = this.extractMathOperator(codeWithoutComparator.rightComparable);
+            console.log('Right Operations', decomposedRightComparable);
 
         //     const lineTokens = codeLine.split(' ');
         //     const interpretedLines: string[] = [];
@@ -329,7 +332,7 @@ export class Luckytickets implements KioTask {
         return rawCodeLine;
     }
 
-    private extractComparator(codeLine: RawCodeLine): ComparatorOperands {
+    private extractComparator(codeLine: RawCodeLine): ComparatorOperand {
         const decomposedLine = {
             comparator: '',
             leftComparable: '',
@@ -356,6 +359,41 @@ export class Luckytickets implements KioTask {
             decomposedLine.comparator = 'GTE';
             decomposedLine.leftComparable = codeLine.expression.split(OperatorsList.GTE)[0]; 
             decomposedLine.rightComparable = codeLine.expression.split(OperatorsList.GTE)[1]; 
+        }
+        return decomposedLine;
+    }
+
+    
+    private extractMathOperator(codeLine: string): BasicToken {
+        const decomposedLine = {
+            operation: '',
+            leftOperand: '',
+            rightOperand: ''
+        }
+
+        const composits = [];
+
+        if (codeLine.includes(OperatorsList.PLUS)) {
+            decomposedLine.operation = 'SUM';
+            decomposedLine.leftOperand = codeLine.split(OperatorsList.PLUS)[0];
+            decomposedLine.rightOperand = codeLine.split(OperatorsList.PLUS)[1];
+            // if type of left operand or right operand is not number or string call this function again
+        } else if (codeLine.includes(OperatorsList.MINUS)) {
+            decomposedLine.operation = 'SUBTR';
+            decomposedLine.leftOperand = codeLine.split(OperatorsList.MINUS)[0];
+            decomposedLine.rightOperand = codeLine.split(OperatorsList.MINUS)[1];
+        } else if (codeLine.includes(OperatorsList.MULT)) {
+            decomposedLine.operation = 'MULT';
+            decomposedLine.leftOperand = codeLine.split(OperatorsList.MULT)[0];
+            decomposedLine.rightOperand = codeLine.split(OperatorsList.MULT)[1];
+        } else if (codeLine.includes(OperatorsList.DIVISION)) {
+            decomposedLine.operation = 'DIV';
+            decomposedLine.leftOperand = codeLine.split(OperatorsList.DIVISION)[0];
+            decomposedLine.rightOperand = codeLine.split(OperatorsList.DIVISION)[1];
+        } else if (codeLine.includes(OperatorsList.POW)) {
+            decomposedLine.operation = 'EXP';
+            decomposedLine.leftOperand = codeLine.split(OperatorsList.POW)[0];
+            decomposedLine.rightOperand = codeLine.split(OperatorsList.POW)[1];
         }
         return decomposedLine;
     }
