@@ -10,12 +10,35 @@ enum OperatorsList {
     MULT = '*',
     LT = '<',
     LTE = '<=',
-    MT = '>',
-    MTE = '>=',
+    GT = '>',
+    GTE = '>=',
     PLUS = '+',
     MINUS = '-',
     DIVISION = '/',
     EQUALS = '='
+}
+
+type ArithmeticOperator = 'plus' | 'minus' | 'mult' | 'division' | 'power' | 'radical';
+type MathOperation = 'SUM' | 'SUBTRACTION' | 'MULTIPLY' | ' DIVIDE' | 'EXP' | 'SQRT';
+type Comparator = 'EQUALS' | 'LT' | 'LTE' | 'GT' | 'GTE';
+type Conditionals = 'IF' | 'THEN' | 'ELSE';
+
+interface BasicToken {
+    operation: MathOperation;
+    operator: ArithmeticOperator;
+    leftOperand: number | string;
+    rightOperand: number | string;
+}
+
+interface RawCodeLine {
+    conditional: Conditionals | string;
+    expression: string;
+}
+
+interface ComparatorOperands {
+    comparator: Comparator | string;
+    leftComparable: string;
+    rightComparable: string;
 }
 
 // interface TokenTypes {
@@ -25,7 +48,6 @@ enum OperatorsList {
 //     logical:
 // }
 
-// interface ArithmeticOperator: '+'
 export class Luckytickets implements KioTask {
     private settings: KioTaskSettings;
     private kioapi: KioApi;
@@ -208,76 +230,134 @@ export class Luckytickets implements KioTask {
         return processedData;
     }
 
+    // Think how to call functions recursively
+    // Think about brakets
+
     private processRawData(rawDataArray: string[]): string[] {
         const processedData: string[] = [];
-        rawDataArray.forEach((codeLine) => {
-            const lineTokens = codeLine.split(' ');
-            const interpretedLines: string[] = [];
-            lineTokens.forEach((token, index, lineTokens) => {
+        rawDataArray.forEach((rawLine) => {
+            const codeWithoutCondition = this.extractConditional(rawLine);
+            console.log('Code without condition' , codeWithoutCondition);
+            const codeWithoutComparator = this.extractComparator(codeWithoutCondition);
+            console.log('Code without comparator', codeWithoutComparator);
 
-                if (lineTokens.indexOf(OperatorsList.IF) !== -1) {
-                    if (token === OperatorsList.IF) {
-                        interpretedLines.push('if(');
-                    } else if (index === lineTokens.length - 1) {
-                        if (token.indexOf(OperatorsList.POW) !== -1) {
-                            interpretedLines.push(token.replace(OperatorsList.POW, '**'));
-                            interpretedLines.push(')');
-                        } else {
-                            interpretedLines.push(token + ')');
-                        }
-                    } else if (token === OperatorsList.EQUALS) {
-                        interpretedLines.push(')===(');
-                    } else if (token.indexOf(OperatorsList.POW) !== -1) {
-                        interpretedLines.push(token.replace(OperatorsList.POW, '**'));
-                    } else {
-                        interpretedLines.push(token);
-                    }
-                } else if (lineTokens.indexOf(OperatorsList.THEN) !== -1) {
-                    if (token === OperatorsList.THEN) {
-                        interpretedLines.push('{');
-                    } else if (index === lineTokens.length - 1) {
-                        if (token.indexOf(OperatorsList.POW) !== -1) {
-                            interpretedLines.push(token.replace(OperatorsList.POW, '**'));
-                            interpretedLines.push('}');
-                        } else {
-                            interpretedLines.push(token + '}');
-                        }
-                    } else if (token.indexOf(OperatorsList.POW) !== -1) {
-                        interpretedLines.push(token.replace(OperatorsList.POW, '**'));
-                        if (index === lineTokens.length - 1) {
-                            interpretedLines.push(')');
-                        }
-                    } else {
-                        interpretedLines.push(token);
-                    }
-                } else if (lineTokens.indexOf(OperatorsList.ELSE) !== -1) {
-                    if (token === OperatorsList.ELSE) {
-                        interpretedLines.push('else{');
-                    } else if (index === lineTokens.length - 1) {
-                        interpretedLines.push(token + '}');
-                    } else if (token.indexOf(OperatorsList.POW) !== -1) {
-                        interpretedLines.push(token.replace(OperatorsList.POW, '**'));
-                        if (index === lineTokens.length - 1) {
-                            interpretedLines.push(')');
-                        }
-                    } else {
-                        interpretedLines.push(token);
-                    }
-                } else if (token.indexOf(OperatorsList.POW) !== -1) {
-                    interpretedLines.push(token.replace(OperatorsList.POW, '**'));
-                    if (index === lineTokens.length - 1) {
-                        interpretedLines.push(')');
-                    }
-                } else {
-                    interpretedLines.push(token);
-                }
-            });
+        //     const lineTokens = codeLine.split(' ');
+        //     const interpretedLines: string[] = [];
+        //     lineTokens.forEach((token, index, lineTokens) => {
+        //         if (lineTokens.indexOf(OperatorsList.IF) !== -1) {
+        //             if (token === OperatorsList.IF) {
+        //                 interpretedLines.push('if(');
+        //             } else if (index === lineTokens.length - 1) {
+        //                 if (token.indexOf(OperatorsList.POW) !== -1) {
+        //                     interpretedLines.push(token.replace(OperatorsList.POW, '**'));
+        //                     interpretedLines.push(')');
+        //                 } else {
+        //                     interpretedLines.push(token + ')');
+        //                 }
+        //             } else if (token === OperatorsList.EQUALS) {
+        //                 interpretedLines.push(')===(');
+        //             } else if (token.indexOf(OperatorsList.POW) !== -1) {
+        //                 interpretedLines.push(token.replace(OperatorsList.POW, '**'));
+        //             } else {
+        //                 interpretedLines.push(token);
+        //             }
+        //         } else if (lineTokens.indexOf(OperatorsList.THEN) !== -1) {
+        //             if (token === OperatorsList.THEN) {
+        //                 interpretedLines.push('{');
+        //             } else if (index === lineTokens.length - 1) {
+        //                 if (token.indexOf(OperatorsList.POW) !== -1) {
+        //                     interpretedLines.push(token.replace(OperatorsList.POW, '**'));
+        //                     interpretedLines.push('}');
+        //                 } else {
+        //                     interpretedLines.push(token + '}');
+        //                 }
+        //             } else if (token.indexOf(OperatorsList.POW) !== -1) {
+        //                 interpretedLines.push(token.replace(OperatorsList.POW, '**'));
+        //                 if (index === lineTokens.length - 1) {
+        //                     interpretedLines.push(')');
+        //                 }
+        //             } else {
+        //                 interpretedLines.push(token);
+        //             }
+        //         } else if (lineTokens.indexOf(OperatorsList.ELSE) !== -1) {
+        //             if (token === OperatorsList.ELSE) {
+        //                 interpretedLines.push('else{');
+        //             } else if (index === lineTokens.length - 1) {
+        //                 interpretedLines.push(token + '}');
+        //             } else if (token.indexOf(OperatorsList.POW) !== -1) {
+        //                 interpretedLines.push(token.replace(OperatorsList.POW, '**'));
+        //                 if (index === lineTokens.length - 1) {
+        //                     interpretedLines.push(')');
+        //                 }
+        //             } else {
+        //                 interpretedLines.push(token);
+        //             }
+        //         } else if (token.indexOf(OperatorsList.POW) !== -1) {
+        //             interpretedLines.push(token.replace(OperatorsList.POW, '**'));
+        //             if (index === lineTokens.length - 1) {
+        //                 interpretedLines.push(')');
+        //             }
+        //         } else {
+        //             interpretedLines.push(token);
+        //         }
+        //     });
 
-            const mergedLine = interpretedLines.join('');
+        //     const mergedLine = interpretedLines.join('');
 
-            processedData.push(mergedLine);
+        //     processedData.push(mergedLine);
         });
         return processedData;
+    }
+
+    private extractConditional(codeLine: string): RawCodeLine {
+        // Check when code starts from new string without conditional on it
+        const rawCodeLine = {
+            conditional: '',
+            expression: ''
+        }
+        if (codeLine.includes(OperatorsList.IF)) {
+            rawCodeLine.conditional = 'IF';
+            rawCodeLine.expression = codeLine.substring(OperatorsList.IF.length); 
+        } else if (codeLine.includes(OperatorsList.ELSE)) {
+            rawCodeLine.conditional = 'ELSE';
+            rawCodeLine.expression = codeLine.substring(OperatorsList.ELSE.length); 
+        } else if (codeLine.includes(OperatorsList.THEN)) {
+            rawCodeLine.conditional = 'THEN';
+            rawCodeLine.expression = codeLine.substring(OperatorsList.THEN.length); 
+        }
+
+        return rawCodeLine;
+    }
+
+    private extractComparator(codeLine: RawCodeLine): ComparatorOperands {
+        const decomposedLine = {
+            comparator: '',
+            leftComparable: '',
+            rightComparable: ''
+        }
+
+        if (codeLine.expression.includes(OperatorsList.EQUALS)) {
+            decomposedLine.comparator = 'EQUALS';
+            decomposedLine.leftComparable = codeLine.expression.split(OperatorsList.EQUALS)[0]; 
+            decomposedLine.rightComparable = codeLine.expression.split(OperatorsList.EQUALS)[1]; 
+        } else if (codeLine.expression.includes(OperatorsList.LT)) {
+            decomposedLine.comparator = 'LT';
+            decomposedLine.leftComparable = codeLine.expression.split(OperatorsList.LT)[0]; 
+            decomposedLine.rightComparable = codeLine.expression.split(OperatorsList.LT)[1]; 
+        } else if (codeLine.expression.includes(OperatorsList.LTE)) {
+            decomposedLine.comparator = 'LTE';
+            decomposedLine.leftComparable = codeLine.expression.split(OperatorsList.LTE)[0]; 
+            decomposedLine.rightComparable = codeLine.expression.split(OperatorsList.LTE)[1]; 
+        } else if (codeLine.expression.includes(OperatorsList.GT)) {
+            decomposedLine.comparator = 'GT';
+            decomposedLine.leftComparable = codeLine.expression.split(OperatorsList.GT)[0]; 
+            decomposedLine.rightComparable = codeLine.expression.split(OperatorsList.GT)[1]; 
+        } else if (codeLine.expression.includes(OperatorsList.GTE)) {
+            decomposedLine.comparator = 'GTE';
+            decomposedLine.leftComparable = codeLine.expression.split(OperatorsList.GTE)[0]; 
+            decomposedLine.rightComparable = codeLine.expression.split(OperatorsList.GTE)[1]; 
+        }
+        return decomposedLine;
     }
 
     private callJSFunction(jsString: string): void {
