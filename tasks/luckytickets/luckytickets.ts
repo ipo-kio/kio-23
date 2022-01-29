@@ -19,11 +19,11 @@ enum OperatorsList {
 }
 
 type ArithmeticOperator = 'PLUS' | 'MINUS' | 'MULT' | 'DIVISION' | 'POWER' | 'RADICAL';
-type MathOperation = 'SUM' | 'SUBTR' | 'MULT' | ' DIV' | 'EXP' | 'SQRT';
+type MathOperation = '+' | 'SUBTR' | 'MULT' | ' DIV' | 'EXP' | 'SQRT';
 type Comparator = 'EQUALS' | 'LT' | 'LTE' | 'GT' | 'GTE';
 type Conditionals = 'IF' | 'THEN' | 'ELSE';
 
-interface BasicToken {
+interface BaseToken {
     operation: MathOperation | string;
     leftOperand: number | string;
     rightOperand: number | string;
@@ -38,6 +38,12 @@ interface ComparatorFraction {
     comparator: Comparator | string;
     leftComparable: string;
     rightComparable: string;
+}
+
+interface FunctionComposit {
+    condition: ConditionFraction;
+    comparison: ComparatorFraction;
+    tokens: BaseToken[];
 }
 
 // interface TokenTypes {
@@ -146,7 +152,6 @@ export class Luckytickets implements KioTask {
         stepPlusButton.innerText = 'ШАГ +';
         buttonsContainer.appendChild(stepPlusButton);
         stepPlusButton.addEventListener('click', (event) => {
-            console.log('clicked +');
         });
 
         const instantResultButton = document.createElement('button');
@@ -167,7 +172,6 @@ export class Luckytickets implements KioTask {
         stepMinusButton.className = 'step-minus-button';
         buttonsContainer.appendChild(stepMinusButton);
         stepMinusButton.addEventListener('click', (event) => {
-            console.log('clicked -');
         });
 
         const demoButton = document.createElement('button');
@@ -185,8 +189,8 @@ export class Luckytickets implements KioTask {
                 // }
                 const rawDataArray = this.decomposeExpression(editorElement.value);
                 const jsFunctionString = this.constructJSFunction(rawDataArray);
-                console.log('\n','\n','\n',jsFunctionString);
-                this.callJSFunction(jsFunctionString);
+                // console.log('\n','\n','\n',jsFunctionString);
+                // this.callJSFunction(jsFunctionString);
             }
         });
 
@@ -195,7 +199,6 @@ export class Luckytickets implements KioTask {
         animationButton.className = 'animation-button';
         buttonsContainer.appendChild(animationButton);
         animationButton.addEventListener('click', (event) => {
-            console.log('animation button clicked');
         });
     }
 
@@ -236,13 +239,11 @@ export class Luckytickets implements KioTask {
         const processedData: string[] = [];
         rawDataArray.forEach((rawLine) => {
             const conditionFractionInstance = this.extractConditional(rawLine);
-            console.log('Code without condition' , conditionFractionInstance);
             const comparatorFractionInstance = this.extractComparator(conditionFractionInstance);
-            console.log('Code without comparator', comparatorFractionInstance);
             const decomposedLeftComparable = this.codeContainsOperand(comparatorFractionInstance.leftComparable) ? this.extractMathOperator(comparatorFractionInstance.leftComparable) : comparatorFractionInstance.leftComparable;
-            console.log('Left Operations', decomposedLeftComparable);
             const decomposedRightComparable = this.codeContainsOperand(comparatorFractionInstance.rightComparable) ? this.extractMathOperator(comparatorFractionInstance.rightComparable) : comparatorFractionInstance.rightComparable;
-            console.log('Right Operations', decomposedRightComparable);
+            const jsLine = this.constructJSLine(conditionFractionInstance, comparatorFractionInstance, decomposedLeftComparable, decomposedRightComparable);
+            console.log('JS Line', jsLine);
 
         //     const lineTokens = codeLine.split(' ');
         //     const interpretedLines: string[] = [];
@@ -312,6 +313,15 @@ export class Luckytickets implements KioTask {
         return processedData;
     }
 
+    private constructJSLine(conditionFractionInstance: ConditionFraction, comparatorFractionInstance: ComparatorFraction, decomposedLeftComparable: BaseToken, decomposedRightComparable: BaseToken): string {
+        console.log('Condition', conditionFractionInstance);
+        console.log('Comparator', comparatorFractionInstance);
+        console.log('Left', decomposedLeftComparable);
+        console.log('Right', decomposedRightComparable);
+        const constructedLine = `${conditionFractionInstance.conditional}((${decomposedLeftComparable.leftOperand}${decomposedLeftComparable.operation}${decomposedLeftComparable.rightOperand})${comparatorFractionInstance.comparator}(${decomposedRightComparable.leftOperand}${decomposedRightComparable.operation}${decomposedRightComparable.rightOperand}))`;
+        return constructedLine;
+    }
+
     private codeContainsOperand(codeLine: string): boolean {
         return codeLine.includes(OperatorsList.PLUS) ||
                codeLine.includes(OperatorsList.MINUS) ||
@@ -348,7 +358,7 @@ export class Luckytickets implements KioTask {
         }
 
         if (codeLine.expression.includes(OperatorsList.EQUALS)) {
-            decomposedLine.comparator = 'EQUALS';
+            decomposedLine.comparator = '===';
             decomposedLine.leftComparable = codeLine.expression.split(OperatorsList.EQUALS)[0]; 
             decomposedLine.rightComparable = codeLine.expression.split(OperatorsList.EQUALS)[1]; 
         } else if (codeLine.expression.includes(OperatorsList.LT)) {
@@ -372,7 +382,7 @@ export class Luckytickets implements KioTask {
     }
 
 
-    private extractMathOperator(codeLine: string): BasicToken {
+    private extractMathOperator(codeLine: string): BaseToken {
         const lineWithoutSpaces = codeLine.split(' ').join('');
         const decomposedLine = {
             operation: '',
@@ -383,20 +393,17 @@ export class Luckytickets implements KioTask {
         const composits = [];
 
         if (lineWithoutSpaces.includes(OperatorsList.PLUS)) {
-            decomposedLine.operation = 'SUM';
+            decomposedLine.operation = '+';
             const inputs = lineWithoutSpaces.split(OperatorsList.PLUS);
             if (this.isSimpleExpression(inputs)) {
                 decomposedLine.leftOperand = inputs[0];
                 decomposedLine.rightOperand = inputs[1];
-                console.log('Decomposed Simple Line', decomposedLine);
-
             } else {
                 // if type of left operand or right operand is not number or string call this function again
                 decomposedLine.leftOperand = inputs[0];
                 const signIndex = lineWithoutSpaces.indexOf(OperatorsList.PLUS);
                 const notProcessedString = lineWithoutSpaces.substring(signIndex + 1, codeLine.length);
                 decomposedLine.rightOperand = notProcessedString;
-                console.log('Decomposed Complex Line', decomposedLine);
             }
         } else if (lineWithoutSpaces.includes(OperatorsList.MINUS)) {
             decomposedLine.operation = 'SUBTR';
