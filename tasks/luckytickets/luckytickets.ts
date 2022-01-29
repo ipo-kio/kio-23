@@ -365,6 +365,7 @@ export class Luckytickets implements KioTask {
 
     
     private extractMathOperator(codeLine: string): BasicToken {
+        const lineWithoutSpaces = codeLine.split(' ').join('');
         const decomposedLine = {
             operation: '',
             leftOperand: '',
@@ -373,31 +374,46 @@ export class Luckytickets implements KioTask {
 
         const composits = [];
 
-        if (codeLine.includes(OperatorsList.PLUS)) {
+        if (lineWithoutSpaces.includes(OperatorsList.PLUS)) {
             decomposedLine.operation = 'SUM';
-            decomposedLine.leftOperand = codeLine.split(OperatorsList.PLUS)[0];
-            decomposedLine.rightOperand = codeLine.split(OperatorsList.PLUS)[1];
-            // if type of left operand or right operand is not number or string call this function again
-        } else if (codeLine.includes(OperatorsList.MINUS)) {
+            const inputs = lineWithoutSpaces.split(OperatorsList.PLUS);
+            if (this.isSimpleExpression(inputs)) {
+                decomposedLine.leftOperand = inputs[0];
+                decomposedLine.rightOperand = inputs[1];
+                console.log('Decomposed Simple Line', decomposedLine);
+
+            } else {
+                // if type of left operand or right operand is not number or string call this function again
+                decomposedLine.leftOperand = inputs[0];
+                const signIndex = lineWithoutSpaces.indexOf(OperatorsList.PLUS);
+                const notProcessedString = lineWithoutSpaces.substring(signIndex + 1, codeLine.length);
+                decomposedLine.rightOperand =  notProcessedString;
+                console.log('Decomposed Complex Line', decomposedLine);
+            }
+        } else if (lineWithoutSpaces.includes(OperatorsList.MINUS)) {
             decomposedLine.operation = 'SUBTR';
-            decomposedLine.leftOperand = codeLine.split(OperatorsList.MINUS)[0];
-            decomposedLine.rightOperand = codeLine.split(OperatorsList.MINUS)[1];
-        } else if (codeLine.includes(OperatorsList.MULT)) {
+            decomposedLine.leftOperand = lineWithoutSpaces.split(OperatorsList.MINUS)[0];
+            decomposedLine.rightOperand = lineWithoutSpaces.split(OperatorsList.MINUS)[1];
+        } else if (lineWithoutSpaces.includes(OperatorsList.MULT)) {
             decomposedLine.operation = 'MULT';
-            decomposedLine.leftOperand = codeLine.split(OperatorsList.MULT)[0];
-            decomposedLine.rightOperand = codeLine.split(OperatorsList.MULT)[1];
-        } else if (codeLine.includes(OperatorsList.DIVISION)) {
+            decomposedLine.leftOperand = lineWithoutSpaces.split(OperatorsList.MULT)[0];
+            decomposedLine.rightOperand = lineWithoutSpaces.split(OperatorsList.MULT)[1];
+        } else if (lineWithoutSpaces.includes(OperatorsList.DIVISION)) {
             decomposedLine.operation = 'DIV';
-            decomposedLine.leftOperand = codeLine.split(OperatorsList.DIVISION)[0];
-            decomposedLine.rightOperand = codeLine.split(OperatorsList.DIVISION)[1];
-        } else if (codeLine.includes(OperatorsList.POW)) {
+            decomposedLine.leftOperand = lineWithoutSpaces.split(OperatorsList.DIVISION)[0];
+            decomposedLine.rightOperand = lineWithoutSpaces.split(OperatorsList.DIVISION)[1];
+
+        } else if (lineWithoutSpaces.includes(OperatorsList.POW)) {
             decomposedLine.operation = 'EXP';
-            decomposedLine.leftOperand = codeLine.split(OperatorsList.POW)[0];
-            decomposedLine.rightOperand = codeLine.split(OperatorsList.POW)[1];
+            decomposedLine.leftOperand = lineWithoutSpaces.split(OperatorsList.POW)[0];
+            decomposedLine.rightOperand = lineWithoutSpaces.split(OperatorsList.POW)[1];
         }
         return decomposedLine;
     }
 
+    private isSimpleExpression(inputs: string[]): boolean {
+        return inputs?.length === 2;
+    }
     private callJSFunction(jsString: string): void {
 
     }
