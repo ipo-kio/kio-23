@@ -29,12 +29,12 @@ interface BasicToken {
     rightOperand: number | string;
 }
 
-interface RawCodeLine {
+interface ConditionFraction {
     conditional: Conditionals | string;
     expression: string;
 }
 
-interface ComparatorOperand {
+interface ComparatorFraction {
     comparator: Comparator | string;
     leftComparable: string;
     rightComparable: string;
@@ -235,13 +235,13 @@ export class Luckytickets implements KioTask {
     private processRawData(rawDataArray: string[]): string[] {
         const processedData: string[] = [];
         rawDataArray.forEach((rawLine) => {
-            const codeWithoutCondition = this.extractConditional(rawLine);
-            console.log('Code without condition' , codeWithoutCondition);
-            const codeWithoutComparator = this.extractComparator(codeWithoutCondition);
-            console.log('Code without comparator', codeWithoutComparator);
-            const decomposedLeftComparable = this.extractMathOperator(codeWithoutComparator.leftComparable);
+            const conditionFractionInstance = this.extractConditional(rawLine);
+            console.log('Code without condition' , conditionFractionInstance);
+            const comparatorFractionInstance = this.extractComparator(conditionFractionInstance);
+            console.log('Code without comparator', comparatorFractionInstance);
+            const decomposedLeftComparable = this.codeContainsOperand(comparatorFractionInstance.leftComparable) ? this.extractMathOperator(comparatorFractionInstance.leftComparable) : comparatorFractionInstance.leftComparable;
             console.log('Left Operations', decomposedLeftComparable);
-            const decomposedRightComparable = this.extractMathOperator(codeWithoutComparator.rightComparable);
+            const decomposedRightComparable = this.codeContainsOperand(comparatorFractionInstance.rightComparable) ? this.extractMathOperator(comparatorFractionInstance.rightComparable) : comparatorFractionInstance.rightComparable;
             console.log('Right Operations', decomposedRightComparable);
 
         //     const lineTokens = codeLine.split(' ');
@@ -312,7 +312,15 @@ export class Luckytickets implements KioTask {
         return processedData;
     }
 
-    private extractConditional(codeLine: string): RawCodeLine {
+    private codeContainsOperand(codeLine: string): boolean {
+        return codeLine.includes(OperatorsList.PLUS) ||
+               codeLine.includes(OperatorsList.MINUS) ||
+               codeLine.includes(OperatorsList.MULT) ||
+               codeLine.includes(OperatorsList.DIVISION) ||
+               codeLine.includes(OperatorsList.POW);
+    }
+
+    private extractConditional(codeLine: string): ConditionFraction {
         // Check when code starts from new string without conditional on it
         const rawCodeLine = {
             conditional: '',
@@ -332,7 +340,7 @@ export class Luckytickets implements KioTask {
         return rawCodeLine;
     }
 
-    private extractComparator(codeLine: RawCodeLine): ComparatorOperand {
+    private extractComparator(codeLine: ConditionFraction): ComparatorFraction {
         const decomposedLine = {
             comparator: '',
             leftComparable: '',
@@ -363,7 +371,7 @@ export class Luckytickets implements KioTask {
         return decomposedLine;
     }
 
-    
+
     private extractMathOperator(codeLine: string): BasicToken {
         const lineWithoutSpaces = codeLine.split(' ').join('');
         const decomposedLine = {
@@ -387,7 +395,7 @@ export class Luckytickets implements KioTask {
                 decomposedLine.leftOperand = inputs[0];
                 const signIndex = lineWithoutSpaces.indexOf(OperatorsList.PLUS);
                 const notProcessedString = lineWithoutSpaces.substring(signIndex + 1, codeLine.length);
-                decomposedLine.rightOperand =  notProcessedString;
+                decomposedLine.rightOperand = notProcessedString;
                 console.log('Decomposed Complex Line', decomposedLine);
             }
         } else if (lineWithoutSpaces.includes(OperatorsList.MINUS)) {
