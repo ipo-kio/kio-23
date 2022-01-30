@@ -250,35 +250,51 @@ export class Luckytickets implements KioTask {
         console.log('Complex expression', rawExpression);
         const lineWithoutSpaces = rawExpression.split(' ').join('');
         if (lineWithoutSpaces.includes(OperatorsList.PLUS)) {
-            this.complexExpressionTree.operation = 'SUM';
-            this.complexExpressionTree.operands = this.findOperands(lineWithoutSpaces, OperatorsList.PLUS);
-            console.log(this.complexExpressionTree);
-            this.complexExpressionTree.operands.forEach((component, index, operands) => {
+            const operands = this.findOperands(lineWithoutSpaces, OperatorsList.PLUS);
+            this.complexExpressionTree = {
+                operation: 'SUM',
+                operands
+            }
+            operands.forEach((component, index) => {
                 if (this.codeContainsOperator(component)) {
                     this.keepDecomposing(component, index);
                 }
             });
         } else if (lineWithoutSpaces.includes(OperatorsList.MINUS)) {
             const operands = this.findOperands(lineWithoutSpaces, OperatorsList.MINUS);
-            if (currentIndex) {
+            if (!currentIndex) {
+                this.complexExpressionTree = {
+                    operation: 'SUBT',
+                    operands
+                }
+                operands.forEach((component, index) => {
+                    if (this.codeContainsOperator(component)) {
+                        this.keepDecomposing(component, index);
+                    }
+                });
+            } else if (currentIndex) {
                 this.complexExpressionTree.operands[currentIndex] = {
                     operation: 'SUBT',
                     operands
                 }
-            } else {
-                this.complexExpressionTree.operation = 'SUBT';
-                this.complexExpressionTree.operands = operands;
+                operands.forEach((operand, index) => {
+                    if (this.codeContainsOperator(operand)) {
+                        this.keepDecomposing(operand, index, currentIndex);
+                    }
+                });
             }
-            operands.forEach((operand, index) => {
-                if (this.codeContainsOperator(operand)) {
-                    this.keepDecomposing(operand, index, currentIndex);
-                }
-            });
         } else if (lineWithoutSpaces.includes(OperatorsList.MULT)) {
             const operands = this.findOperands(lineWithoutSpaces, OperatorsList.MULT);
             if (!parentIndex && !currentIndex) {
-                this.complexExpressionTree.operation = 'MULT';
-                this.complexExpressionTree.operands = operands;
+                this.complexExpressionTree = {
+                    operation: 'MULT',
+                    operands
+                }
+                operands.forEach((operand, index) => {
+                    if (this.codeContainsOperator(operand)) {
+                        this.keepDecomposing(operand, index);
+                    }
+                });
             } else if (parentIndex && currentIndex) {
                 this.complexExpressionTree.operands[parentIndex].operands[currentIndex] = {
                     operation: 'MULT',
@@ -304,8 +320,15 @@ export class Luckytickets implements KioTask {
         } else if (lineWithoutSpaces.includes(OperatorsList.DIVISION)) {
             const operands = this.findOperands(lineWithoutSpaces, OperatorsList.DIVISION);
             if (!parentIndex && !currentIndex) {
-                this.complexExpressionTree.operation = 'DIVISION';
-                this.complexExpressionTree.operands = operands;
+                this.complexExpressionTree = {
+                    operation: 'DIVISION',
+                    operands
+                }
+                operands.forEach((operand, index) => {
+                    if (this.codeContainsOperator(operand)) {
+                        this.keepDecomposing(operand, index);
+                    }
+                });
             } else if (parentIndex && currentIndex) {
                 this.complexExpressionTree.operands[parentIndex].operands[currentIndex] = {
                     operation: 'DIVISION',
@@ -327,11 +350,6 @@ export class Luckytickets implements KioTask {
                     }
                 });
             }
-            operands.forEach((operand, index) => {
-                if (this.codeContainsOperator(operand)) {
-                    this.keepDecomposing(operand, index, parentIndex);
-                }
-            });
         }
 
         console.log('TREE', this.complexExpressionTree);
