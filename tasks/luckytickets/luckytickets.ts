@@ -249,7 +249,6 @@ export class Luckytickets implements KioTask {
         return processedData;
     }
 
-    // Think how to call functions recursively
     // Think about brakets
 
     private processRawData(rawDataArray: string[]): string[] {
@@ -282,6 +281,8 @@ export class Luckytickets implements KioTask {
             this.buildTree(lineWithoutSpaces, MathOperations.mult, parentIndex, currentIndex);
         } else if (lineWithoutSpaces.includes(OperatorsList.DIVISION)) {
             this.buildTree(lineWithoutSpaces, MathOperations.division, parentIndex, currentIndex);
+        } else if (lineWithoutSpaces.includes(OperatorsList.POW)) {
+            this.buildTree(lineWithoutSpaces, MathOperations.power, parentIndex, currentIndex);
         }
 
         console.log('TREE', this.complexExpressionTree);
