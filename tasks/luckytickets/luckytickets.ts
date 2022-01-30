@@ -116,10 +116,6 @@ export class Luckytickets implements KioTask {
         inputTicketImage.innerHTML = '<input maxlength="6" class="input-number" placeholder="abcdef">';
         inputTicketContainer.appendChild(inputTicketImage);
         inputTicketImage.addEventListener('input', (event: InputEvent) => {
-            // Add input validation
-            // Show error message for incorrect input
-            // Pass input to algorithm
-            // Specify max length as variable
             if (event?.data) {
                 this.storedInput += event.data;
             }
@@ -202,16 +198,8 @@ export class Luckytickets implements KioTask {
         buttonsContainer.appendChild(demoButton);
         demoButton.addEventListener('click', (event) => {
             if (editorElement?.value) {
-                // if (editorElement.value.toUpperCase() === 'ПЕЧАТЬ' && this.storedInput?.length) {
-                //     alert(`Your Input IS ${this.storedInput}`);
-                // } else if (!this.storedInput.length && editorElement.value.toUpperCase() === 'ПЕЧАТЬ') {
-                //     alert('NO INPUT');
-                //  } else {
-                //     alert('UNKNOWN FUNCTION');
-                // }
                 const rawDataArray = this.splitLines(editorElement.value);
                 const jsFunctionString = this.constructJSFunction(rawDataArray);
-                // console.log('\n','\n','\n',jsFunctionString);
                 // this.callJSFunction(jsFunctionString);
             }
         });
@@ -254,8 +242,6 @@ export class Luckytickets implements KioTask {
         return processedData;
     }
 
-    // Think about brakets
-
     private processRawData(rawDataArray: string[]): string[] {
         const processedData: string[] = [];
         rawDataArray.forEach((rawLine) => {
@@ -283,7 +269,6 @@ export class Luckytickets implements KioTask {
             console.log('Right Tree', decomposedRight);
 
             // const jsLine = this.constructJSLine(conditionExpression, compareExpression, decomposedLeft, decomposedRight);
-            // console.log('JS Line', jsLine);
         });
         return processedData;
     }
@@ -349,8 +334,6 @@ export class Luckytickets implements KioTask {
         return constructedLine;
     }
 
-    // Add check for unsupported characters
-
     private codeContainsOperator(codeLine: string): boolean {
         const hasOperand = codeLine.includes(OperatorsList.PLUS) ||
             codeLine.includes(OperatorsList.MINUS) ||
@@ -361,7 +344,6 @@ export class Luckytickets implements KioTask {
     }
 
     private buildCondition(codeLine: string): ConditionExpression {
-        // Check when code starts from new string without conditional on it
         const conditionExpression = {
             condition: '',
             expression: ''
