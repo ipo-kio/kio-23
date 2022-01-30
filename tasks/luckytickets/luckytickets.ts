@@ -19,7 +19,7 @@ enum OperatorsList {
 }
 
 type ArithmeticOperator = 'PLUS' | 'MINUS' | 'MULT' | 'DIVISION' | 'POWER' | 'RADICAL';
-type MathOperation = '+' | '-' | '*' | '/' | '**' | 'SQRT' | '';
+type MathOperation = 'SUM' | 'SUBT' | 'MULT' | 'DIVISION' | 'POWER' | 'SQRT' | '';
 type Comparator = '===' | 'LT' | 'LTE' | 'GT' | 'GTE';
 type Conditionals = 'IF' | 'THEN' | 'ELSE';
 
@@ -44,14 +44,6 @@ interface FunctionComposit {
     comparison: ComparatorFraction;
     tokens: BaseToken[];
 }
-
-// interface TokenTypes {
-//     numeric: number;
-//     identifier: string;
-//     arithmetic: ArithmeticOperator;
-//     logical:
-// }
-
 export class Luckytickets implements KioTask {
     private settings: KioTaskSettings;
     private kioapi: KioApi;
@@ -245,71 +237,6 @@ export class Luckytickets implements KioTask {
             const decomposedRightComparable = !this.codeContainsOperator(comparatorFractionInstance.rightComparable) ? comparatorFractionInstance.rightComparable : this.isSimpleExpression(comparatorFractionInstance.rightComparable) ? this.extractMathOperator(comparatorFractionInstance.rightComparable) : this.keepDecomposing(comparatorFractionInstance.rightComparable);
             // const jsLine = this.constructJSLine(conditionFractionInstance, comparatorFractionInstance, decomposedLeftComparable, decomposedRightComparable);
             // console.log('JS Line', jsLine);
-
-        //     const lineTokens = codeLine.split(' ');
-        //     const interpretedLines: string[] = [];
-        //     lineTokens.forEach((token, index, lineTokens) => {
-        //         if (lineTokens.indexOf(OperatorsList.IF) !== -1) {
-        //             if (token === OperatorsList.IF) {
-        //                 interpretedLines.push('if(');
-        //             } else if (index === lineTokens.length - 1) {
-        //                 if (token.indexOf(OperatorsList.POW) !== -1) {
-        //                     interpretedLines.push(token.replace(OperatorsList.POW, '**'));
-        //                     interpretedLines.push(')');
-        //                 } else {
-        //                     interpretedLines.push(token + ')');
-        //                 }
-        //             } else if (token === OperatorsList.EQUALS) {
-        //                 interpretedLines.push(')===(');
-        //             } else if (token.indexOf(OperatorsList.POW) !== -1) {
-        //                 interpretedLines.push(token.replace(OperatorsList.POW, '**'));
-        //             } else {
-        //                 interpretedLines.push(token);
-        //             }
-        //         } else if (lineTokens.indexOf(OperatorsList.THEN) !== -1) {
-        //             if (token === OperatorsList.THEN) {
-        //                 interpretedLines.push('{');
-        //             } else if (index === lineTokens.length - 1) {
-        //                 if (token.indexOf(OperatorsList.POW) !== -1) {
-        //                     interpretedLines.push(token.replace(OperatorsList.POW, '**'));
-        //                     interpretedLines.push('}');
-        //                 } else {
-        //                     interpretedLines.push(token + '}');
-        //                 }
-        //             } else if (token.indexOf(OperatorsList.POW) !== -1) {
-        //                 interpretedLines.push(token.replace(OperatorsList.POW, '**'));
-        //                 if (index === lineTokens.length - 1) {
-        //                     interpretedLines.push(')');
-        //                 }
-        //             } else {
-        //                 interpretedLines.push(token);
-        //             }
-        //         } else if (lineTokens.indexOf(OperatorsList.ELSE) !== -1) {
-        //             if (token === OperatorsList.ELSE) {
-        //                 interpretedLines.push('else{');
-        //             } else if (index === lineTokens.length - 1) {
-        //                 interpretedLines.push(token + '}');
-        //             } else if (token.indexOf(OperatorsList.POW) !== -1) {
-        //                 interpretedLines.push(token.replace(OperatorsList.POW, '**'));
-        //                 if (index === lineTokens.length - 1) {
-        //                     interpretedLines.push(')');
-        //                 }
-        //             } else {
-        //                 interpretedLines.push(token);
-        //             }
-        //         } else if (token.indexOf(OperatorsList.POW) !== -1) {
-        //             interpretedLines.push(token.replace(OperatorsList.POW, '**'));
-        //             if (index === lineTokens.length - 1) {
-        //                 interpretedLines.push(')');
-        //             }
-        //         } else {
-        //             interpretedLines.push(token);
-        //         }
-        //     });
-
-        //     const mergedLine = interpretedLines.join('');
-
-        //     processedData.push(mergedLine);
         });
         return processedData;
     }
@@ -324,7 +251,7 @@ export class Luckytickets implements KioTask {
         const lineWithoutSpaces = rawExpression.split(' ').join('');
         // Remove plus
         if (lineWithoutSpaces.includes(OperatorsList.PLUS)) {
-            this.complexExpressionTree.operation = '+';
+            this.complexExpressionTree.operation = 'SUM';
             this.complexExpressionTree.operands = this.findOperands(lineWithoutSpaces, OperatorsList.PLUS);
             console.log(this.complexExpressionTree);
             this.complexExpressionTree.operands.forEach((component, index, operands) => {
@@ -335,7 +262,7 @@ export class Luckytickets implements KioTask {
         } else if (lineWithoutSpaces.includes(OperatorsList.MINUS)) {
             const operands = this.findOperands(lineWithoutSpaces, OperatorsList.MINUS);
             this.complexExpressionTree.operands[currentIndex] = {
-                operation: '-',
+                operation: 'SUBT',
                 operands
             }
             operands.forEach((operand, index) => {
@@ -343,20 +270,10 @@ export class Luckytickets implements KioTask {
                     this.keepDecomposing(operand, index, currentIndex);
                 }
             });
-            // this.complexExpressionTree.operands[index].operation = '-';
-            // this.complexExpressionTree.operands[index].operand = this.findOperands(lineWithoutSpaces, OperatorsList.MINUS);
-            
-            // this.complexExpressionTree.operation = '-';
-            // this.complexExpressionTree.operands = this.findOperands(lineWithoutSpaces, OperatorsList.MINUS);
-            // this.complexExpressionTree.operands.forEach((component, index, operands) => {
-            //     if (this.codeContainsOperator(component)) {
-            //         this.keepDecomposing(component);
-            //     }
-            // });
         } else if (lineWithoutSpaces.includes(OperatorsList.MULT)) {
             const operands = this.findOperands(lineWithoutSpaces, OperatorsList.MULT);
             this.complexExpressionTree.operands[parentIndex].operands[currentIndex] = {
-                operation: '*',
+                operation: 'MULT',
                 operands
             }
             operands.forEach((operand, index) => {
@@ -368,7 +285,7 @@ export class Luckytickets implements KioTask {
             const operands = this.findOperands(lineWithoutSpaces, OperatorsList.DIVISION);
 
             this.complexExpressionTree.operands[parentIndex].operands[currentIndex] = {
-                operation: '/',
+                operation: 'DIVISION',
                 operands
             }
 
@@ -380,10 +297,6 @@ export class Luckytickets implements KioTask {
         }
 
         console.log('TREE', this.complexExpressionTree);
-        // Remove minus
-        // Remove multiplication
-        // Remove division
-
     }
 
     private constructJSLine(conditionFractionInstance: ConditionFraction, comparatorFractionInstance: ComparatorFraction, decomposedLeftComparable: BaseToken, decomposedRightComparable: BaseToken): string {
@@ -462,30 +375,19 @@ export class Luckytickets implements KioTask {
         }
 
         if (lineWithoutSpaces.includes(OperatorsList.PLUS)) {
-            decomposedLine.operation = '+';
+            decomposedLine.operation = 'SUM';
             decomposedLine.operands = this.findOperands(lineWithoutSpaces, OperatorsList.PLUS);
-            // const inputs = lineWithoutSpaces.split(OperatorsList.PLUS);
-            // if (this.isSimpleExpression(codeLine)) {
-            //     decomposedLine.leftOperand = inputs[0];
-            //     decomposedLine.rightOperand = inputs[1];
-            // } else {
-            //     // if type of left operand or right operand is not number or string call this function again
-            //     decomposedLine.leftOperand = inputs[0];
-            //     const signIndex = lineWithoutSpaces.indexOf(OperatorsList.PLUS);
-            //     const notProcessedString = lineWithoutSpaces.substring(signIndex + 1, codeLine.length);
-            //     decomposedLine.rightOperand = notProcessedString;
-            // }
         } else if (lineWithoutSpaces.includes(OperatorsList.MINUS)) {
-            decomposedLine.operation = '-';
+            decomposedLine.operation = 'SUBT';
             decomposedLine.operands = this.findOperands(lineWithoutSpaces, OperatorsList.MINUS);
         } else if (lineWithoutSpaces.includes(OperatorsList.MULT)) {
-            decomposedLine.operation = '*';
+            decomposedLine.operation = 'MULT';
             decomposedLine.operands = this.findOperands(lineWithoutSpaces, OperatorsList.MULT);
         } else if (lineWithoutSpaces.includes(OperatorsList.DIVISION)) {
-            decomposedLine.operation = '/';
+            decomposedLine.operation = 'DIVISION';
             decomposedLine.operands = this.findOperands(lineWithoutSpaces, OperatorsList.DIVISION);
         } else if (lineWithoutSpaces.includes(OperatorsList.POW)) {
-            decomposedLine.operation = '**';
+            decomposedLine.operation = 'POWER';
             decomposedLine.operands = this.findOperands(lineWithoutSpaces, OperatorsList.POW);
         }
         return decomposedLine;
