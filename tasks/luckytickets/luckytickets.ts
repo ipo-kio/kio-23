@@ -18,12 +18,46 @@ enum OperatorsList {
     POW = '^'
 }
 
+const MathOperations = {
+    sum: {
+        operation: 'SUM',
+        userOperator: '+',
+        jsOperator: '+'
+    },
+    subtr: {
+        operation: 'SUBT',
+        userOperator: '-',
+        jsOperator: '-'
+    },
+    mult: {
+        operation: 'MULT',
+        userOperator: '*',
+        jsOperator: '*'
+    },
+    division: {
+        operation: 'DIVISION',
+        userOperator: '/',
+        jsOperator: '/'
+    },
+    power: {
+        operation: 'POWER',
+        userOperator: '^',
+        jsOperator: '**'
+    }
+}
+
+interface MathOperator {
+    operation: string;
+    userOperator: string;
+    jsOperator: string;
+}
+
 type MathOperation = 'SUM' | 'SUBT' | 'MULT' | 'DIVISION' | 'POWER' | 'SQRT' | '';
 type Comparator = '===' | 'LT' | 'LTE' | 'GT' | 'GTE';
 type Conditionals = 'IF' | 'THEN' | 'ELSE';
 
 interface BaseToken {
-    operation: MathOperation;
+    operation: string;
     operands: any[];
 }
 
@@ -239,112 +273,53 @@ export class Luckytickets implements KioTask {
     };
 
     private keepDecomposing(rawExpression: string, currentIndex?: number, parentIndex?: number) {
-        console.log('Complex expression', rawExpression);
         const lineWithoutSpaces = rawExpression.split(' ').join('');
         if (lineWithoutSpaces.includes(OperatorsList.PLUS)) {
-            const operands = this.findOperands(lineWithoutSpaces, OperatorsList.PLUS);
-            this.complexExpressionTree = {
-                operation: 'SUM',
-                operands
-            }
-            operands.forEach((component, index) => {
-                if (this.codeContainsOperator(component)) {
-                    this.keepDecomposing(component, index);
-                }
-            });
+            this.buildTree(lineWithoutSpaces, MathOperations.sum, parentIndex, currentIndex);
         } else if (lineWithoutSpaces.includes(OperatorsList.MINUS)) {
-            const operands = this.findOperands(lineWithoutSpaces, OperatorsList.MINUS);
-            if (currentIndex === undefined) {
-                this.complexExpressionTree = {
-                    operation: 'SUBT',
-                    operands
-                }
-                operands.forEach((component, index) => {
-                    if (this.codeContainsOperator(component)) {
-                        this.keepDecomposing(component, index);
-                    }
-                });
-            } else if (currentIndex !== undefined) {
-                this.complexExpressionTree.operands[currentIndex] = {
-                    operation: 'SUBT',
-                    operands
-                }
-                operands.forEach((operand, index) => {
-                    if (this.codeContainsOperator(operand)) {
-                        this.keepDecomposing(operand, index, currentIndex);
-                    }
-                });
-            }
+            this.buildTree(lineWithoutSpaces, MathOperations.subtr, parentIndex, currentIndex);
         } else if (lineWithoutSpaces.includes(OperatorsList.MULT)) {
-            const operands = this.findOperands(lineWithoutSpaces, OperatorsList.MULT);
-            if (parentIndex === undefined && currentIndex === undefined) {
-                this.complexExpressionTree = {
-                    operation: 'MULT',
-                    operands
-                }
-                operands.forEach((operand, index) => {
-                    if (this.codeContainsOperator(operand)) {
-                        this.keepDecomposing(operand, index);
-                    }
-                });
-            } else if (parentIndex !== undefined && currentIndex !== undefined) {
-                this.complexExpressionTree.operands[parentIndex].operands[currentIndex] = {
-                    operation: 'MULT',
-                    operands
-                }
-                operands.forEach((operand, index) => {
-                    if (this.codeContainsOperator(operand)) {
-                        this.keepDecomposing(operand, index, parentIndex);
-                    }
-                })
-            } else if (currentIndex !== undefined && parentIndex === undefined) {
-                this.complexExpressionTree.operands[currentIndex] = {
-                    operation: 'MULT',
-                    operands
-                }
-                operands.forEach((operand, index) => {
-                    if (this.codeContainsOperator(operand)) {
-                        this.keepDecomposing(operand, index, currentIndex);
-                    }
-                })
-            }
-            ;
+            this.buildTree(lineWithoutSpaces, MathOperations.mult, parentIndex, currentIndex);
         } else if (lineWithoutSpaces.includes(OperatorsList.DIVISION)) {
-            const operands = this.findOperands(lineWithoutSpaces, OperatorsList.DIVISION);
-            if (parentIndex === undefined && currentIndex === undefined) {
-                this.complexExpressionTree = {
-                    operation: 'DIVISION',
-                    operands
-                }
-                operands.forEach((operand, index) => {
-                    if (this.codeContainsOperator(operand)) {
-                        this.keepDecomposing(operand, index);
-                    }
-                });
-            } else if (parentIndex !== undefined && currentIndex !== undefined) {
-                this.complexExpressionTree.operands[parentIndex].operands[currentIndex] = {
-                    operation: 'DIVISION',
-                    operands
-                }
-                operands.forEach((operand, index) => {
-                    if (this.codeContainsOperator(operand)) {
-                        this.keepDecomposing(operand, index, parentIndex);
-                    }
-                });
-            } else if (currentIndex !== undefined && parentIndex === undefined) {
-                this.complexExpressionTree.operands[currentIndex] = {
-                    operation: 'DIVISION',
-                    operands
-                }
-                operands.forEach((operand, index) => {
-                    if (this.codeContainsOperator(operand)) {
-                        this.keepDecomposing(operand, index, currentIndex);
-                    }
-                });
-            }
+            this.buildTree(lineWithoutSpaces, MathOperations.division, parentIndex, currentIndex);
         }
 
         console.log('TREE', this.complexExpressionTree);
+    }
+
+    private buildTree(lineWithoutSpaces: string, mathOperator: MathOperator, parentIndex: number, currentIndex: number) {
+        const operands = this.findOperands(lineWithoutSpaces, mathOperator.userOperator);
+        if (parentIndex === undefined && currentIndex === undefined) {
+            this.complexExpressionTree = {
+                operation: mathOperator.operation,
+                operands
+            }
+            operands.forEach((operand, index) => {
+                if (this.codeContainsOperator(operand)) {
+                    this.keepDecomposing(operand, index);
+                }
+            });
+        } else if (currentIndex !== undefined && parentIndex === undefined) {
+            this.complexExpressionTree.operands[currentIndex] = {
+                operation: mathOperator.operation,
+                operands
+            }
+            operands.forEach((operand, index) => {
+                if (this.codeContainsOperator(operand)) {
+                    this.keepDecomposing(operand, index, currentIndex);
+                }
+            });
+        } else if (parentIndex !== undefined && currentIndex !== undefined) {
+            this.complexExpressionTree.operands[parentIndex].operands[currentIndex] = {
+                operation: mathOperator.operation,
+                operands
+            }
+            operands.forEach((operand, index) => {
+                if (this.codeContainsOperator(operand)) {
+                    this.keepDecomposing(operand, index, parentIndex);
+                }
+            });
+        }
     }
 
     private constructJSLine(conditionFractionInstance: ConditionFraction, comparatorFractionInstance: ComparatorFraction, decomposedLeftComparable: BaseToken, decomposedRightComparable: BaseToken): string {
