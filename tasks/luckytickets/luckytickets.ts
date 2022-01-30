@@ -18,7 +18,6 @@ enum OperatorsList {
     POW = '^'
 }
 
-type ArithmeticOperator = 'PLUS' | 'MINUS' | 'MULT' | 'DIVISION' | 'POWER' | 'RADICAL';
 type MathOperation = 'SUM' | 'SUBT' | 'MULT' | 'DIVISION' | 'POWER' | 'SQRT' | '';
 type Comparator = '===' | 'LT' | 'LTE' | 'GT' | 'GTE';
 type Conditionals = 'IF' | 'THEN' | 'ELSE';
@@ -37,12 +36,6 @@ interface ComparatorFraction {
     comparator: Comparator | string;
     leftComparable: string;
     rightComparable: string;
-}
-
-interface FunctionComposit {
-    condition: ConditionFraction;
-    comparison: ComparatorFraction;
-    tokens: BaseToken[];
 }
 export class Luckytickets implements KioTask {
     private settings: KioTaskSettings;
@@ -132,7 +125,6 @@ export class Luckytickets implements KioTask {
                 this.updateRuler(editorElement.value);
             }
         });
-
 
         const buttonsContainer = document.createElement('div');
         buttonsContainer.className = 'buttons-container';
@@ -232,9 +224,9 @@ export class Luckytickets implements KioTask {
             const conditionFractionInstance = this.extractConditional(rawLine);
             const comparatorFractionInstance = this.extractComparator(conditionFractionInstance);
 
-            const decomposedLeftComparable = !this.codeContainsOperator(comparatorFractionInstance.leftComparable) ? comparatorFractionInstance.leftComparable : this.isSimpleExpression(comparatorFractionInstance.leftComparable) ? this.extractMathOperator(comparatorFractionInstance.leftComparable) : this.keepDecomposing(comparatorFractionInstance.leftComparable);
+            const decomposedLeftComparable = !this.codeContainsOperator(comparatorFractionInstance.leftComparable) ? comparatorFractionInstance.leftComparable : this.keepDecomposing(comparatorFractionInstance.leftComparable);
 
-            const decomposedRightComparable = !this.codeContainsOperator(comparatorFractionInstance.rightComparable) ? comparatorFractionInstance.rightComparable : this.isSimpleExpression(comparatorFractionInstance.rightComparable) ? this.extractMathOperator(comparatorFractionInstance.rightComparable) : this.keepDecomposing(comparatorFractionInstance.rightComparable);
+            const decomposedRightComparable = !this.codeContainsOperator(comparatorFractionInstance.rightComparable) ? comparatorFractionInstance.rightComparable :  this.keepDecomposing(comparatorFractionInstance.rightComparable);
             // const jsLine = this.constructJSLine(conditionFractionInstance, comparatorFractionInstance, decomposedLeftComparable, decomposedRightComparable);
             // console.log('JS Line', jsLine);
         });
@@ -423,34 +415,6 @@ export class Luckytickets implements KioTask {
         return decomposedLine;
     }
 
-    // private containsOneOperatorType
-
-    private extractMathOperator(rawCodeLine: string): BaseToken {
-        const lineWithoutSpaces = rawCodeLine.split(' ').join('');
-        const decomposedLine: BaseToken = {
-            operation: '',
-            operands: [],
-        }
-
-        if (lineWithoutSpaces.includes(OperatorsList.PLUS)) {
-            decomposedLine.operation = 'SUM';
-            decomposedLine.operands = this.findOperands(lineWithoutSpaces, OperatorsList.PLUS);
-        } else if (lineWithoutSpaces.includes(OperatorsList.MINUS)) {
-            decomposedLine.operation = 'SUBT';
-            decomposedLine.operands = this.findOperands(lineWithoutSpaces, OperatorsList.MINUS);
-        } else if (lineWithoutSpaces.includes(OperatorsList.MULT)) {
-            decomposedLine.operation = 'MULT';
-            decomposedLine.operands = this.findOperands(lineWithoutSpaces, OperatorsList.MULT);
-        } else if (lineWithoutSpaces.includes(OperatorsList.DIVISION)) {
-            decomposedLine.operation = 'DIVISION';
-            decomposedLine.operands = this.findOperands(lineWithoutSpaces, OperatorsList.DIVISION);
-        } else if (lineWithoutSpaces.includes(OperatorsList.POW)) {
-            decomposedLine.operation = 'POWER';
-            decomposedLine.operands = this.findOperands(lineWithoutSpaces, OperatorsList.POW);
-        }
-        return decomposedLine;
-    }
-
     private findOperands(lineWithoutSpaces: string, operator: string): string[] {
         const tokens: string[] = [];
         const arrayWithoutOperand = lineWithoutSpaces.split(operator);
@@ -459,18 +423,6 @@ export class Luckytickets implements KioTask {
         });
         return tokens;
 
-    }
-
-    // a + b
-    // a * b
-    // a - b
-    // a / b
-    private isSimpleExpression(rawExpression: string): boolean {
-        const expression = rawExpression.split(' ').join('');
-        const simpleExpression = expression && expression.length === 3 &&
-        this.codeContainsOperator(rawExpression) &&
-        (typeof expression[0] === 'string' || typeof expression[2] === 'number');
-        return simpleExpression;
     }
 
     private callJSFunction(jsString: string): void {
