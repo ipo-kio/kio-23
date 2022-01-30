@@ -61,15 +61,15 @@ interface BaseToken {
     operands: any[];
 }
 
-interface ConditionFraction {
-    conditional: Conditionals | string;
+interface ConditionExpression {
+    condition: Conditionals | string;
     expression: string;
 }
 
-interface ComparatorFraction {
+interface CompareExpression {
     comparator: Comparator | string;
-    leftComparable: string;
-    rightComparable: string;
+    left: string;
+    right: string;
 }
 export class Luckytickets implements KioTask {
     private settings: KioTaskSettings;
@@ -78,6 +78,11 @@ export class Luckytickets implements KioTask {
     private storedInput = '';
     private linesCount = 1;
     private linesArray = [1];
+    
+    private complexExpressionTree: BaseToken = {
+        operation: '',
+        operands: []
+    };
 
     constructor(settings: KioTaskSettings) {
         this.settings = settings;
@@ -254,22 +259,39 @@ export class Luckytickets implements KioTask {
     private processRawData(rawDataArray: string[]): string[] {
         const processedData: string[] = [];
         rawDataArray.forEach((rawLine) => {
-            const conditionFractionInstance = this.extractConditional(rawLine);
-            const comparatorFractionInstance = this.extractComparator(conditionFractionInstance);
+            const conditionExpression: ConditionExpression = this.buildCondition(rawLine);
+            const compareExpression: CompareExpression = this.buildCompare(conditionExpression);
 
-            const decomposedLeftComparable = !this.codeContainsOperator(comparatorFractionInstance.leftComparable) ? comparatorFractionInstance.leftComparable : this.keepDecomposing(comparatorFractionInstance.leftComparable);
+            let decomposedLeft: any;
+            if (this.codeContainsOperator(compareExpression.left)) {
+                this.initTree();
+                this.keepDecomposing(compareExpression.left);
+                decomposedLeft = Object.assign({}, this.complexExpressionTree);
+            } else {
+                decomposedLeft = compareExpression.left;
+            }
 
-            const decomposedRightComparable = !this.codeContainsOperator(comparatorFractionInstance.rightComparable) ? comparatorFractionInstance.rightComparable :  this.keepDecomposing(comparatorFractionInstance.rightComparable);
-            // const jsLine = this.constructJSLine(conditionFractionInstance, comparatorFractionInstance, decomposedLeftComparable, decomposedRightComparable);
+            let decomposedRight: any;
+            if (this.codeContainsOperator(compareExpression.right)) {
+                this.initTree();
+                this.keepDecomposing(compareExpression.right);
+                decomposedRight = this.complexExpressionTree;
+            } else {
+                decomposedRight = Object.assign({}, compareExpression.right);
+            }
+            console.log('Left Tree', decomposedLeft);
+            console.log('Right Tree', decomposedRight);
+
+            // const jsLine = this.constructJSLine(conditionExpression, compareExpression, decomposedLeft, decomposedRight);
             // console.log('JS Line', jsLine);
         });
         return processedData;
     }
 
-    private complexExpressionTree: BaseToken = {
-        operation: '',
-        operands: []
-    };
+    private initTree() {
+        this.complexExpressionTree.operation = '';
+        this.complexExpressionTree.operands = [];
+    }
 
     private keepDecomposing(rawExpression: string, currentIndex?: number, parentIndex?: number) {
         const lineWithoutSpaces = rawExpression.split(' ').join('');
@@ -284,8 +306,6 @@ export class Luckytickets implements KioTask {
         } else if (lineWithoutSpaces.includes(OperatorsList.POW)) {
             this.buildTree(lineWithoutSpaces, MathOperations.power, parentIndex, currentIndex);
         }
-
-        console.log('TREE', this.complexExpressionTree);
     }
 
     private buildTree(lineWithoutSpaces: string, mathOperator: MathOperator, parentIndex: number, currentIndex: number) {
@@ -323,9 +343,9 @@ export class Luckytickets implements KioTask {
         }
     }
 
-    private constructJSLine(conditionFractionInstance: ConditionFraction, comparatorFractionInstance: ComparatorFraction, decomposedLeftComparable: BaseToken, decomposedRightComparable: BaseToken): string {
+    private constructJSLine(conditionExpression: ConditionExpression, compareExpression: CompareExpression, decomposedLeft: BaseToken, decomposedRight: BaseToken): string {
         const constructedLine = '';
-        // const constructedLine = `${conditionFractionInstance.conditional}((${decomposedLeftComparable.operands[0]}${decomposedLeftComparable.operation}${decomposedLeftComparable.operands[1]})${comparatorFractionInstance.comparator}(${decomposedRightComparable.operands[0]}${decomposedRightComparable.operation}${decomposedRightComparable.operands[1]}))`;
+        // const constructedLine = `${conditionExpression.conditional}((${decomposedLeftComparable.operands[0]}${decomposedLeftComparable.operation}${decomposedLeftComparable.operands[1]})${comparatorFractionInstance.comparator}(${decomposedRightComparable.operands[0]}${decomposedRightComparable.operation}${decomposedRightComparable.operands[1]}))`;
         return constructedLine;
     }
 
@@ -340,53 +360,53 @@ export class Luckytickets implements KioTask {
         return hasOperand;
     }
 
-    private extractConditional(codeLine: string): ConditionFraction {
+    private buildCondition(codeLine: string): ConditionExpression {
         // Check when code starts from new string without conditional on it
-        const rawCodeLine = {
-            conditional: '',
+        const conditionExpression = {
+            condition: '',
             expression: ''
         }
         if (codeLine.includes(OperatorsList.IF)) {
-            rawCodeLine.conditional = 'IF';
-            rawCodeLine.expression = codeLine.substring(OperatorsList.IF.length); 
+            conditionExpression.condition = 'IF';
+            conditionExpression.expression = codeLine.substring(OperatorsList.IF.length); 
         } else if (codeLine.includes(OperatorsList.ELSE)) {
-            rawCodeLine.conditional = 'ELSE';
-            rawCodeLine.expression = codeLine.substring(OperatorsList.ELSE.length); 
+            conditionExpression.condition = 'ELSE';
+            conditionExpression.expression = codeLine.substring(OperatorsList.ELSE.length); 
         } else if (codeLine.includes(OperatorsList.THEN)) {
-            rawCodeLine.conditional = 'THEN';
-            rawCodeLine.expression = codeLine.substring(OperatorsList.THEN.length); 
+            conditionExpression.condition = 'THEN';
+            conditionExpression.expression = codeLine.substring(OperatorsList.THEN.length); 
         }
 
-        return rawCodeLine;
+        return conditionExpression;
     }
 
-    private extractComparator(codeLine: ConditionFraction): ComparatorFraction {
+    private buildCompare(codeLine: ConditionExpression): CompareExpression {
         const decomposedLine = {
             comparator: '',
-            leftComparable: '',
-            rightComparable: ''
+            left: '',
+            right: ''
         }
 
         if (codeLine.expression.includes(OperatorsList.EQUALS)) {
             decomposedLine.comparator = '===';
-            decomposedLine.leftComparable = codeLine.expression.split(OperatorsList.EQUALS)[0]; 
-            decomposedLine.rightComparable = codeLine.expression.split(OperatorsList.EQUALS)[1]; 
+            decomposedLine.left = codeLine.expression.split(OperatorsList.EQUALS)[0]; 
+            decomposedLine.right = codeLine.expression.split(OperatorsList.EQUALS)[1]; 
         } else if (codeLine.expression.includes(OperatorsList.LT)) {
             decomposedLine.comparator = 'LT';
-            decomposedLine.leftComparable = codeLine.expression.split(OperatorsList.LT)[0]; 
-            decomposedLine.rightComparable = codeLine.expression.split(OperatorsList.LT)[1]; 
+            decomposedLine.left = codeLine.expression.split(OperatorsList.LT)[0]; 
+            decomposedLine.right = codeLine.expression.split(OperatorsList.LT)[1]; 
         } else if (codeLine.expression.includes(OperatorsList.LTE)) {
             decomposedLine.comparator = 'LTE';
-            decomposedLine.leftComparable = codeLine.expression.split(OperatorsList.LTE)[0]; 
-            decomposedLine.rightComparable = codeLine.expression.split(OperatorsList.LTE)[1]; 
+            decomposedLine.left = codeLine.expression.split(OperatorsList.LTE)[0]; 
+            decomposedLine.right = codeLine.expression.split(OperatorsList.LTE)[1]; 
         } else if (codeLine.expression.includes(OperatorsList.GT)) {
             decomposedLine.comparator = 'GT';
-            decomposedLine.leftComparable = codeLine.expression.split(OperatorsList.GT)[0]; 
-            decomposedLine.rightComparable = codeLine.expression.split(OperatorsList.GT)[1]; 
+            decomposedLine.left = codeLine.expression.split(OperatorsList.GT)[0]; 
+            decomposedLine.right = codeLine.expression.split(OperatorsList.GT)[1]; 
         } else if (codeLine.expression.includes(OperatorsList.GTE)) {
             decomposedLine.comparator = 'GTE';
-            decomposedLine.leftComparable = codeLine.expression.split(OperatorsList.GTE)[0]; 
-            decomposedLine.rightComparable = codeLine.expression.split(OperatorsList.GTE)[1]; 
+            decomposedLine.left = codeLine.expression.split(OperatorsList.GTE)[0]; 
+            decomposedLine.right = codeLine.expression.split(OperatorsList.GTE)[1]; 
         }
         return decomposedLine;
     }
