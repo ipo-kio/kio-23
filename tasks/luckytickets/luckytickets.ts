@@ -240,9 +240,9 @@ export class Luckytickets implements KioTask {
             const conditionFractionInstance = this.extractConditional(rawLine);
             const comparatorFractionInstance = this.extractComparator(conditionFractionInstance);
 
-            const decomposedLeftComparable = !this.codeContainsOperand(comparatorFractionInstance.leftComparable) ? comparatorFractionInstance.leftComparable : this.isSimpleExpression(comparatorFractionInstance.leftComparable) ? this.extractMathOperator(comparatorFractionInstance.leftComparable) : this.keepDecomposing(comparatorFractionInstance.leftComparable);
+            const decomposedLeftComparable = !this.codeContainsOperator(comparatorFractionInstance.leftComparable) ? comparatorFractionInstance.leftComparable : this.isSimpleExpression(comparatorFractionInstance.leftComparable) ? this.extractMathOperator(comparatorFractionInstance.leftComparable) : this.keepDecomposing(comparatorFractionInstance.leftComparable);
 
-            const decomposedRightComparable = !this.codeContainsOperand(comparatorFractionInstance.rightComparable) ? comparatorFractionInstance.rightComparable : this.isSimpleExpression(comparatorFractionInstance.rightComparable) ? this.extractMathOperator(comparatorFractionInstance.rightComparable) : this.keepDecomposing(comparatorFractionInstance.rightComparable);
+            const decomposedRightComparable = !this.codeContainsOperator(comparatorFractionInstance.rightComparable) ? comparatorFractionInstance.rightComparable : this.isSimpleExpression(comparatorFractionInstance.rightComparable) ? this.extractMathOperator(comparatorFractionInstance.rightComparable) : this.keepDecomposing(comparatorFractionInstance.rightComparable);
             // const jsLine = this.constructJSLine(conditionFractionInstance, comparatorFractionInstance, decomposedLeftComparable, decomposedRightComparable);
             // console.log('JS Line', jsLine);
 
@@ -319,7 +319,7 @@ export class Luckytickets implements KioTask {
         operands: []
     };
 
-    private keepDecomposing(rawExpression: string, index?: number) {
+    private keepDecomposing(rawExpression: string, currentIndex?: number, parentIndex?: number) {
         console.log('Complex expression', rawExpression);
         const lineWithoutSpaces = rawExpression.split(' ').join('');
         // Remove plus
@@ -328,39 +328,55 @@ export class Luckytickets implements KioTask {
             this.complexExpressionTree.operands = this.findOperands(lineWithoutSpaces, OperatorsList.PLUS);
             console.log(this.complexExpressionTree);
             this.complexExpressionTree.operands.forEach((component, index, operands) => {
-                if (this.codeContainsOperand(component)) {
-                    // if (component.includes(OperatorsList.MINUS)) {
-                    //     this.complexExpressionTree.operands[index].operation = '-';
-                    //     this.complexExpressionTree.operands[index].operands =  this.findOperands(lineWithoutSpaces, OperatorsList.MINUS);
-                    // }
+                if (this.codeContainsOperator(component)) {
                     this.keepDecomposing(component, index);
                 }
             });
         } else if (lineWithoutSpaces.includes(OperatorsList.MINUS)) {
-            this.complexExpressionTree.operands[index] = {
+            const operands = this.findOperands(lineWithoutSpaces, OperatorsList.MINUS);
+            this.complexExpressionTree.operands[currentIndex] = {
                 operation: '-',
-                operands: this.findOperands(lineWithoutSpaces, OperatorsList.MINUS)
+                operands
             }
+            operands.forEach((operand, index) => {
+                if (this.codeContainsOperator(operand)) {
+                    this.keepDecomposing(operand, index, currentIndex);
+                }
+            });
             // this.complexExpressionTree.operands[index].operation = '-';
             // this.complexExpressionTree.operands[index].operand = this.findOperands(lineWithoutSpaces, OperatorsList.MINUS);
             
             // this.complexExpressionTree.operation = '-';
             // this.complexExpressionTree.operands = this.findOperands(lineWithoutSpaces, OperatorsList.MINUS);
             // this.complexExpressionTree.operands.forEach((component, index, operands) => {
-            //     if (this.codeContainsOperand(component)) {
+            //     if (this.codeContainsOperator(component)) {
             //         this.keepDecomposing(component);
             //     }
             // });
         } else if (lineWithoutSpaces.includes(OperatorsList.MULT)) {
-            this.complexExpressionTree.operands[index] = {
+            const operands = this.findOperands(lineWithoutSpaces, OperatorsList.MULT);
+            this.complexExpressionTree.operands[parentIndex].operands[currentIndex] = {
                 operation: '*',
-                operands: this.findOperands(lineWithoutSpaces, OperatorsList.MULT)
+                operands
             }
+            operands.forEach((operand, index) => {
+                if (this.codeContainsOperator(operand)) {
+                    this.keepDecomposing(operand, index, parentIndex);
+                }
+            });
         } else if (lineWithoutSpaces.includes(OperatorsList.DIVISION)) {
-            this.complexExpressionTree.operands[index] = {
+            const operands = this.findOperands(lineWithoutSpaces, OperatorsList.DIVISION);
+
+            this.complexExpressionTree.operands[parentIndex].operands[currentIndex] = {
                 operation: '/',
-                operands: this.findOperands(lineWithoutSpaces, OperatorsList.DIVISION)
+                operands
             }
+
+            operands.forEach((operand, index) => {
+                if (this.codeContainsOperator(operand)) {
+                    this.keepDecomposing(operand, index, parentIndex);
+                }
+            });
         }
 
         console.log('TREE', this.complexExpressionTree);
@@ -378,7 +394,7 @@ export class Luckytickets implements KioTask {
 
     // Add check for unsupported characters
 
-    private codeContainsOperand(codeLine: string): boolean {
+    private codeContainsOperator(codeLine: string): boolean {
         const hasOperand = codeLine.includes(OperatorsList.PLUS) ||
             codeLine.includes(OperatorsList.MINUS) ||
             codeLine.includes(OperatorsList.MULT) ||
@@ -492,7 +508,7 @@ export class Luckytickets implements KioTask {
     private isSimpleExpression(rawExpression: string): boolean {
         const expression = rawExpression.split(' ').join('');
         const simpleExpression = expression && expression.length === 3 &&
-        this.codeContainsOperand(rawExpression) &&
+        this.codeContainsOperator(rawExpression) &&
         (typeof expression[0] === 'string' || typeof expression[2] === 'number');
         return simpleExpression;
     }
