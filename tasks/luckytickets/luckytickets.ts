@@ -262,7 +262,7 @@ export class Luckytickets implements KioTask {
             });
         } else if (lineWithoutSpaces.includes(OperatorsList.MINUS)) {
             const operands = this.findOperands(lineWithoutSpaces, OperatorsList.MINUS);
-            if (!currentIndex) {
+            if (currentIndex === undefined) {
                 this.complexExpressionTree = {
                     operation: 'SUBT',
                     operands
@@ -272,7 +272,7 @@ export class Luckytickets implements KioTask {
                         this.keepDecomposing(component, index);
                     }
                 });
-            } else if (currentIndex) {
+            } else if (currentIndex !== undefined) {
                 this.complexExpressionTree.operands[currentIndex] = {
                     operation: 'SUBT',
                     operands
@@ -285,7 +285,7 @@ export class Luckytickets implements KioTask {
             }
         } else if (lineWithoutSpaces.includes(OperatorsList.MULT)) {
             const operands = this.findOperands(lineWithoutSpaces, OperatorsList.MULT);
-            if (!parentIndex && !currentIndex) {
+            if (parentIndex === undefined && currentIndex === undefined) {
                 this.complexExpressionTree = {
                     operation: 'MULT',
                     operands
@@ -295,7 +295,7 @@ export class Luckytickets implements KioTask {
                         this.keepDecomposing(operand, index);
                     }
                 });
-            } else if (parentIndex && currentIndex) {
+            } else if (parentIndex !== undefined && currentIndex !== undefined) {
                 this.complexExpressionTree.operands[parentIndex].operands[currentIndex] = {
                     operation: 'MULT',
                     operands
@@ -305,7 +305,7 @@ export class Luckytickets implements KioTask {
                         this.keepDecomposing(operand, index, parentIndex);
                     }
                 })
-            } else if (currentIndex && !parentIndex) {
+            } else if (currentIndex !== undefined && parentIndex === undefined) {
                 this.complexExpressionTree.operands[currentIndex] = {
                     operation: 'MULT',
                     operands
@@ -319,7 +319,7 @@ export class Luckytickets implements KioTask {
             ;
         } else if (lineWithoutSpaces.includes(OperatorsList.DIVISION)) {
             const operands = this.findOperands(lineWithoutSpaces, OperatorsList.DIVISION);
-            if (!parentIndex && !currentIndex) {
+            if (parentIndex === undefined && currentIndex === undefined) {
                 this.complexExpressionTree = {
                     operation: 'DIVISION',
                     operands
@@ -329,7 +329,7 @@ export class Luckytickets implements KioTask {
                         this.keepDecomposing(operand, index);
                     }
                 });
-            } else if (parentIndex && currentIndex) {
+            } else if (parentIndex !== undefined && currentIndex !== undefined) {
                 this.complexExpressionTree.operands[parentIndex].operands[currentIndex] = {
                     operation: 'DIVISION',
                     operands
@@ -339,7 +339,7 @@ export class Luckytickets implements KioTask {
                         this.keepDecomposing(operand, index, parentIndex);
                     }
                 });
-            } else if (currentIndex && !parentIndex) {
+            } else if (currentIndex !== undefined && parentIndex === undefined) {
                 this.complexExpressionTree.operands[currentIndex] = {
                     operation: 'DIVISION',
                     operands
