@@ -272,10 +272,18 @@ export class Luckytickets implements KioTask {
             });
         } else if (lineWithoutSpaces.includes(OperatorsList.MULT)) {
             const operands = this.findOperands(lineWithoutSpaces, OperatorsList.MULT);
-            this.complexExpressionTree.operands[parentIndex].operands[currentIndex] = {
-                operation: 'MULT',
-                operands
+            if (parentIndex) {
+                this.complexExpressionTree.operands[parentIndex].operands[currentIndex] = {
+                    operation: 'MULT',
+                    operands
+                }
+            } else {
+                this.complexExpressionTree.operands[currentIndex] = {
+                    operation: 'MULT',
+                    operands
+                }
             }
+            
             operands.forEach((operand, index) => {
                 if (this.codeContainsOperator(operand)) {
                     this.keepDecomposing(operand, index, parentIndex);
@@ -283,11 +291,18 @@ export class Luckytickets implements KioTask {
             });
         } else if (lineWithoutSpaces.includes(OperatorsList.DIVISION)) {
             const operands = this.findOperands(lineWithoutSpaces, OperatorsList.DIVISION);
-
-            this.complexExpressionTree.operands[parentIndex].operands[currentIndex] = {
-                operation: 'DIVISION',
-                operands
+            if (parentIndex) {
+                this.complexExpressionTree.operands[parentIndex].operands[currentIndex] = {
+                    operation: 'DIVISION',
+                    operands
+                }
+            } else {
+                this.complexExpressionTree.operands[currentIndex] = {
+                    operation: 'DIVISION',
+                    operands
+                }
             }
+            
 
             operands.forEach((operand, index) => {
                 if (this.codeContainsOperator(operand)) {
