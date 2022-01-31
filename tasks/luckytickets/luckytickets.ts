@@ -35,7 +35,7 @@ const MathOperations: AllowedOperations = {
         jsOperator: '+'
     },
     subtr: {
-        operation: 'SUBT',
+        operation: 'SUBTR',
         userOperator: '-',
         jsOperator: '-'
     },
@@ -62,7 +62,7 @@ interface MathOperator {
     jsOperator: string;
 }
 
-type MathOperation = 'SUM' | 'SUBT' | 'MULT' | 'DIVISION' | 'POWER' | 'SQRT' | '';
+type MathOperation = 'SUM' | 'SUBTR' | 'MULT' | 'DIVISION' | 'POWER' | 'SQRT' | '';
 type Comparator = '===' | 'LT' | 'LTE' | 'GT' | 'GTE';
 type Conditionals = 'IF' | 'THEN' | 'ELSE';
 
@@ -342,16 +342,55 @@ export class Luckytickets implements KioTask {
 
     private constructJSLine(conditionExpression: ConditionExpression, compareExpression: CompareExpression, decomposedLeft: BaseToken, decomposedRight: BaseToken): string {
         // const constructedLine = '';
+        this.resetJSExpression();
         const leftExpression = this.constructExpression(decomposedLeft);
+        this.resetJSExpression();
         const rightExpression = this.constructExpression(decomposedRight);
         const constructedLine = `${conditionExpression.condition}(${leftExpression}${compareExpression.comparator}${rightExpression})`;
         // const constructedLine = `${conditionExpression.conditional}((${decomposedLeftComparable.operands[0]}${decomposedLeftComparable.operation}${decomposedLeftComparable.operands[1]})${comparatorFractionInstance.comparator}(${decomposedRightComparable.operands[0]}${decomposedRightComparable.operation}${decomposedRightComparable.operands[1]}))`;
         return constructedLine;
     }
 
-    private constructExpression(exprTree: any): string {
-        const expr = `(${exprTree.operands.join(this.getJSOperator(exprTree.operation))})`;
-        return expr;
+    private resetJSExpression() {
+        this.expr = '';
+    }
+
+    private expr = '';
+    private constructExpression(exprTree: any, rawParentOperator?: string): string {
+        const parentOperator = rawParentOperator ? this.getJSOperator(rawParentOperator) : '';
+
+        exprTree.operands.forEach((operand: any, index: number, operands: any[]) => {
+            if (typeof operand === 'string') {
+                if (index < operands.length - 1) {
+                    if (index === 0) {
+                        this.expr = `${this.expr}${parentOperator}(${operand}`;
+                    } else if (index > 0) {
+                        this.expr = `${this.expr}${this.getJSOperator(exprTree.operation)}${operand}`;
+                    }
+                } else if (index === operands.length - 1) {
+                    this.expr = `${this.expr}${parentOperator}${this.getJSOperator(exprTree.operation)}${operand})`;
+                }
+            } else {
+                this.constructExpression(operand, exprTree.operation);
+            }
+        });
+        // exprTree.operands.forEach((operand: any, index: number, operands: any[]) => {
+        //     if (typeof operand === 'string') {
+        //         if (index < operands.length - 1) {
+        //             if (index === 0) {
+        //                 this.expr = `${this.expr}(${operand}${this.getJSOperator(exprTree.operation)}`;
+        //             } else if (index > 0) {
+        //                 this.expr = `${this.expr}${operand}${this.getJSOperator(exprTree.operation)}`;
+        //             }
+        //         } else if (index === operands.length - 1) {
+        //             this.expr = `${this.expr}${operand})`;
+        //         }
+        //     } else {
+        //         this.constructExpression(operand);
+        //     }
+        // });
+        // const expr = `(${exprTree.operands.join(this.getJSOperator(exprTree.operation))})`;
+        return this.expr;
     }
 
     private getJSOperator(operation: string): string {
