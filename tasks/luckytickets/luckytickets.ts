@@ -345,19 +345,21 @@ export class Luckytickets implements KioTask {
 
     private constructExpression(exprTree: any, rawParentOperator?: string): string {
         let expr = '';
-        if (exprTree.operands.every((operand: any) => {
+        if (typeof exprTree === 'string') {
+            return expr = exprTree;
+        } else if (exprTree.operands.every((operand: any) => {
             return typeof operand === 'string';
         })) {
             return expr = `(${exprTree.operands.join(this.getJSOperator(exprTree.operation))})`;
         } else {
-            const complexExpressions = exprTree.operands.filter((operand: any) => {
-                return typeof operand !== 'string';
-            });
-            const simpleExpressions = exprTree.operands.filter((operand: any) => {
-                return typeof operand === 'string';
-            });
-            expr += simpleExpressions.join(this.getJSOperator(exprTree.operation));
-            complexExpressions.forEach((entry: any) => {
+            // const complexExpressions = exprTree.operands.filter((operand: any) => {
+            //     return typeof operand !== 'string';
+            // });
+            // const simpleExpressions = exprTree.operands.filter((operand: any) => {
+            //     return typeof operand === 'string';
+            // });
+            // expr += simpleExpressions.join(this.getJSOperator(exprTree.operation));
+            exprTree.operands.forEach((entry: any) => {
                 const operatorNeeded = expr.length > 0 ? this.getJSOperator(exprTree.operation) : '';
                 expr += operatorNeeded + this.constructExpression(entry);
             });
