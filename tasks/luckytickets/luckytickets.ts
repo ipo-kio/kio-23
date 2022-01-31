@@ -17,7 +17,6 @@ enum OperatorsList {
     DIVISION = '/',
     POW = '^'
 }
-
 interface AllowedOperations {
     [key: string]: PrimitiveOperation;
 }
@@ -55,15 +54,13 @@ const MathOperations: AllowedOperations = {
         jsOperator: '**'
     }
 }
-
 interface MathOperator {
     operation: string;
     userOperator: string;
     jsOperator: string;
 }
 
-type MathOperation = 'SUM' | 'SUBTR' | 'MULT' | 'DIVISION' | 'POWER' | 'SQRT' | '';
-type Comparator = '===' | 'LT' | 'LTE' | 'GT' | 'GTE';
+type Comparator = '===' | '<' | '<=' | '>' | '>=' | '=';
 type Conditionals = 'IF' | 'THEN' | 'ELSE';
 
 interface BaseToken {
@@ -248,7 +245,7 @@ export class Luckytickets implements KioTask {
     }
 
     private constructJSFunction(rawDataArray: string[]): string {
-        return this.processRawData(rawDataArray).join(';');
+        return this.processRawData(rawDataArray).join('');
     }
 
     private processRawData(rawDataArray: string[]): string[] {
@@ -339,11 +336,19 @@ export class Luckytickets implements KioTask {
     private constructJSLine(conditionExpression: ConditionExpression, compareExpression: CompareExpression, decomposedLeft: BaseToken, decomposedRight: BaseToken): string {
         const leftExpression = this.constructExpression(decomposedLeft);
         const rightExpression = this.constructExpression(decomposedRight);
-        const constructedLine = `${conditionExpression.condition}(${leftExpression}${compareExpression.comparator}${rightExpression})`;
+        const comparator = '';
+        let constructedLine = '';
+        if (conditionExpression.condition === 'IF') {
+            constructedLine = `${conditionExpression.condition}(${leftExpression}${compareExpression.comparator}${rightExpression})`;
+        } else if (conditionExpression.condition === 'THEN') {
+            constructedLine = `{${leftExpression}${compareExpression.comparator}${rightExpression}}`;
+        } else if (conditionExpression.condition === 'ELSE') {
+            constructedLine = `${conditionExpression.condition}{${leftExpression}${compareExpression.comparator}${rightExpression}}`;
+        }
         return constructedLine;
     }
 
-    private constructExpression(exprTree: any, rawParentOperator?: string): string {
+    private constructExpression(exprTree: any): string {
         let expr = '';
         if (typeof exprTree === 'string') {
             return expr = exprTree;
@@ -388,7 +393,6 @@ export class Luckytickets implements KioTask {
             conditionExpression.condition = 'THEN';
             conditionExpression.expression = codeLine.substring(OperatorsList.THEN.length); 
         }
-
         return conditionExpression;
     }
 
@@ -400,23 +404,27 @@ export class Luckytickets implements KioTask {
         }
 
         if (codeLine.expression.includes(OperatorsList.EQUALS)) {
-            decomposedLine.comparator = '===';
+            if (codeLine.condition === 'IF') {
+                decomposedLine.comparator = '===';
+            } else if (codeLine.condition === 'ELSE' || codeLine.condition === 'THEN') {
+                decomposedLine.comparator = '=';
+            }
             decomposedLine.left = codeLine.expression.split(OperatorsList.EQUALS)[0]; 
             decomposedLine.right = codeLine.expression.split(OperatorsList.EQUALS)[1]; 
         } else if (codeLine.expression.includes(OperatorsList.LT)) {
-            decomposedLine.comparator = 'LT';
+            decomposedLine.comparator = '<';
             decomposedLine.left = codeLine.expression.split(OperatorsList.LT)[0]; 
             decomposedLine.right = codeLine.expression.split(OperatorsList.LT)[1]; 
         } else if (codeLine.expression.includes(OperatorsList.LTE)) {
-            decomposedLine.comparator = 'LTE';
+            decomposedLine.comparator = '<=';
             decomposedLine.left = codeLine.expression.split(OperatorsList.LTE)[0]; 
             decomposedLine.right = codeLine.expression.split(OperatorsList.LTE)[1]; 
         } else if (codeLine.expression.includes(OperatorsList.GT)) {
-            decomposedLine.comparator = 'GT';
+            decomposedLine.comparator = '>';
             decomposedLine.left = codeLine.expression.split(OperatorsList.GT)[0]; 
             decomposedLine.right = codeLine.expression.split(OperatorsList.GT)[1]; 
         } else if (codeLine.expression.includes(OperatorsList.GTE)) {
-            decomposedLine.comparator = 'GTE';
+            decomposedLine.comparator = '>=';
             decomposedLine.left = codeLine.expression.split(OperatorsList.GTE)[0]; 
             decomposedLine.right = codeLine.expression.split(OperatorsList.GTE)[1]; 
         }
@@ -430,11 +438,9 @@ export class Luckytickets implements KioTask {
             tokens.push(operand);
         });
         return tokens;
-
     }
 
     private callJSFunction(jsString: string): void {
-
     }
 
     parameters(): KioParameterDescription[] {
