@@ -18,7 +18,17 @@ enum OperatorsList {
     POW = '^'
 }
 
-const MathOperations = {
+interface AllowedOperations {
+    [key: string]: PrimitiveOperation;
+}
+
+interface PrimitiveOperation {
+    operation: string;
+    userOperator: string;
+    jsOperator: string;
+}
+
+const MathOperations: AllowedOperations = {
     sum: {
         operation: 'SUM',
         userOperator: '+',
@@ -239,6 +249,7 @@ export class Luckytickets implements KioTask {
 
     private constructJSFunction(rawDataArray: string[]): string {
         const processedData = this.processRawData(rawDataArray).join('');
+        console.log('PROCESSED DATA', processedData);
         return processedData;
     }
 
@@ -268,7 +279,8 @@ export class Luckytickets implements KioTask {
             console.log('Left Tree', decomposedLeft);
             console.log('Right Tree', decomposedRight);
 
-            // const jsLine = this.constructJSLine(conditionExpression, compareExpression, decomposedLeft, decomposedRight);
+            const jsLine = this.constructJSLine(conditionExpression, compareExpression, decomposedLeft, decomposedRight);
+            processedData.push(jsLine);
         });
         return processedData;
     }
@@ -329,9 +341,23 @@ export class Luckytickets implements KioTask {
     }
 
     private constructJSLine(conditionExpression: ConditionExpression, compareExpression: CompareExpression, decomposedLeft: BaseToken, decomposedRight: BaseToken): string {
-        const constructedLine = '';
+        // const constructedLine = '';
+        const leftExpression = this.constructExpression(decomposedLeft);
+        const rightExpression = this.constructExpression(decomposedRight);
+        const constructedLine = `${conditionExpression.condition}(${leftExpression}${compareExpression.comparator}${rightExpression})`;
         // const constructedLine = `${conditionExpression.conditional}((${decomposedLeftComparable.operands[0]}${decomposedLeftComparable.operation}${decomposedLeftComparable.operands[1]})${comparatorFractionInstance.comparator}(${decomposedRightComparable.operands[0]}${decomposedRightComparable.operation}${decomposedRightComparable.operands[1]}))`;
         return constructedLine;
+    }
+
+    private constructExpression(exprTree: any): string {
+        const expr = `(${exprTree.operands.join(this.getJSOperator(exprTree.operation))})`;
+        return expr;
+    }
+
+    private getJSOperator(operation: string): string {
+        // const operationName = operation.toLowerCase();
+        const jsOperator = MathOperations[operation.toLowerCase()].jsOperator;
+        return jsOperator;
     }
 
     private codeContainsOperator(codeLine: string): boolean {
