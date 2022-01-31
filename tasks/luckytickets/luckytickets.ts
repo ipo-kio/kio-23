@@ -355,43 +355,52 @@ export class Luckytickets implements KioTask {
         this.expr = '';
     }
 
-    private expr = '';
+    // private expr = '';
     private constructExpression(exprTree: any, rawParentOperator?: string): string {
-        const parentOperator = rawParentOperator ? this.getJSOperator(rawParentOperator) : '';
+        let expr = '';
+        if (exprTree.operands.every((operand: any) => {
+            return typeof operand === 'string';
+        })) {
+            return expr = `(${exprTree.operands.join(this.getJSOperator(exprTree.operation))})`;
+        } else {
+            const complexExpressions = exprTree.operands.filter((operand: any) => {
+                return typeof operand !== 'string';
+            });
+            const simpleExpressions = exprTree.operands.filter((operand: any) => {
+                return typeof operand === 'string';
+            });
+            expr = expr + simpleExpressions.join(this.getJSOperator(exprTree.operation));
+            complexExpressions.forEach((entry: any) => {
+                const operatorNeeded = expr.length > 0 ? this.getJSOperator(exprTree.operation) : '';
+                expr = expr + operatorNeeded + this.constructExpression(entry);
+            });
+            console.log(expr);
+            return '(' + expr + ')';
+        }
+        // return expr;
+        // const parentOperator = rawParentOperator ? this.getJSOperator(rawParentOperator) : '';
+        // this.expr = this.expr + '(';
 
-        exprTree.operands.forEach((operand: any, index: number, operands: any[]) => {
-            if (typeof operand === 'string') {
-                if (index < operands.length - 1) {
-                    if (index === 0) {
-                        this.expr = `${this.expr}(${operand}`;
-                    } else if (index > 0) {
-                        this.expr = `${this.expr}${this.getJSOperator(exprTree.operation)}${operand}`;
-                    }
-                } else if (index === operands.length - 1) {
-                    this.expr = `${this.expr}${this.getJSOperator(exprTree.operation)}${operand})`;
-                }
-            } else {
-                this.expr = this.expr + this.getJSOperator(exprTree.operation);
-                this.constructExpression(operand, exprTree.operation);
-            }
-        });
         // exprTree.operands.forEach((operand: any, index: number, operands: any[]) => {
         //     if (typeof operand === 'string') {
-        //         if (index < operands.length - 1) {
-        //             if (index === 0) {
-        //                 this.expr = `${this.expr}(${operand}${this.getJSOperator(exprTree.operation)}`;
-        //             } else if (index > 0) {
-        //                 this.expr = `${this.expr}${operand}${this.getJSOperator(exprTree.operation)}`;
-        //             }
-        //         } else if (index === operands.length - 1) {
-        //             this.expr = `${this.expr}${operand})`;
+        //         if (index === 0) {
+        //             this.expr = this.expr + operand;
+        //         } else {
+        //             this.expr = this.expr + this.getJSOperator(exprTree.operation) + operand;
         //         }
         //     } else {
-        //         this.constructExpression(operand);
+        //         // if (rawParentOperator) {
+        //         this.expr = this.expr + this.getJSOperator(exprTree.operation);
+        //         // }
+        //         this.constructExpression(operand, exprTree.operation);
         //     }
         // });
-        // const expr = `(${exprTree.operands.join(this.getJSOperator(exprTree.operation))})`;
-        return this.expr;
+        // this.expr = this.expr + ')';
+        // return this.expr;
+    }
+
+    private isPrimitive(operand: any): boolean{
+        return typeof operand === 'string';
     }
 
     private getJSOperator(operation: string): string {
