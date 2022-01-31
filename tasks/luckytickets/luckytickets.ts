@@ -336,7 +336,6 @@ export class Luckytickets implements KioTask {
     private constructJSLine(conditionExpression: ConditionExpression, compareExpression: CompareExpression, decomposedLeft: BaseToken, decomposedRight: BaseToken): string {
         const leftExpression = this.constructExpression(decomposedLeft);
         const rightExpression = this.constructExpression(decomposedRight);
-        const comparator = '';
         let constructedLine = '';
         if (conditionExpression.condition === 'IF') {
             constructedLine = `${conditionExpression.condition}(${leftExpression}${compareExpression.comparator}${rightExpression})`;
