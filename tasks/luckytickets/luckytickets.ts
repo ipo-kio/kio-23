@@ -363,14 +363,15 @@ export class Luckytickets implements KioTask {
             if (typeof operand === 'string') {
                 if (index < operands.length - 1) {
                     if (index === 0) {
-                        this.expr = `${this.expr}${parentOperator}(${operand}`;
+                        this.expr = `${this.expr}(${operand}`;
                     } else if (index > 0) {
                         this.expr = `${this.expr}${this.getJSOperator(exprTree.operation)}${operand}`;
                     }
                 } else if (index === operands.length - 1) {
-                    this.expr = `${this.expr}${parentOperator}${this.getJSOperator(exprTree.operation)}${operand})`;
+                    this.expr = `${this.expr}${this.getJSOperator(exprTree.operation)}${operand})`;
                 }
             } else {
+                this.expr = this.expr + this.getJSOperator(exprTree.operation);
                 this.constructExpression(operand, exprTree.operation);
             }
         });
