@@ -167,7 +167,7 @@ export class Luckytickets implements KioTask {
 
         const stepPlusButton = document.createElement('button');
         stepPlusButton.className = 'step-plus-button';
-        stepPlusButton.innerText = 'ШАГ +';
+        stepPlusButton.innerText = 'СЛЕДУЮЩАЯ ОШИБКА';
         buttonsContainer.appendChild(stepPlusButton);
         stepPlusButton.addEventListener('click', (event) => {
         });
@@ -186,14 +186,14 @@ export class Luckytickets implements KioTask {
         });
 
         const stepMinusButton = document.createElement('button');
-        stepMinusButton.innerText = 'ШАГ -';
+        stepMinusButton.innerText = 'ПРЕДЫДУЩАЯ ОШИБКА';
         stepMinusButton.className = 'step-minus-button';
         buttonsContainer.appendChild(stepMinusButton);
         stepMinusButton.addEventListener('click', (event) => {
         });
 
         const demoButton = document.createElement('button');
-        demoButton.innerText = 'РЕЖИМ ДЕМОНСТРАЦИИ';
+        demoButton.innerText = 'ЗАПУСК';
         demoButton.className = 'demo-button';
         buttonsContainer.appendChild(demoButton);
         demoButton.addEventListener('click', (event) => {

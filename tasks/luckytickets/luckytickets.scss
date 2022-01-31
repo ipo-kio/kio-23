@@ -70,6 +70,7 @@
             margin: 10px;
             border-radius: 5px;
             &.animation-button {
+                visibility: hidden;
                 grid-row-start: 1;
                 grid-row-end: 2;
             }
@@ -82,16 +83,21 @@
                 grid-row-end: 4;
             }
             &.instant-result-button {
+                visibility: hidden;
                 grid-row-start: 2;
                 grid-row-end: 3;
                 grid-column-start: 2;
                 grid-column-end: 2;
             }
             &.demo-button {
+                background-color: #9ccc65;
                 grid-row-start: 3;
                 grid-row-end: 4;
                 grid-column-start: 2;
                 grid-column-end: 2;
+                &:hover, &:active {
+                    background-color: #6b9b37;
+                }
             }
         }
     }
