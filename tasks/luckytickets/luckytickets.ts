@@ -210,6 +210,7 @@ export class Luckytickets implements KioTask {
             if (editorElement?.value) {
                 const rawDataArray = this.splitLines(editorElement.value);
                 const jsFunctionString = this.constructJSFunction(rawDataArray);
+                console.log('PROCESSED DATA', jsFunctionString);
                 // this.callJSFunction(jsFunctionString);
             }
         });
@@ -243,14 +244,11 @@ export class Luckytickets implements KioTask {
     }
 
     private splitLines(editorValue: string): string[] {
-        const codeLines = editorValue.split(/\r*\n/);
-        return codeLines;
+        return editorValue.split(/\r*\n/);
     }
 
     private constructJSFunction(rawDataArray: string[]): string {
-        const processedData = this.processRawData(rawDataArray).join('');
-        console.log('PROCESSED DATA', processedData);
-        return processedData;
+        return this.processRawData(rawDataArray).join('');
     }
 
     private processRawData(rawDataArray: string[]): string[] {
@@ -276,8 +274,6 @@ export class Luckytickets implements KioTask {
             } else {
                 decomposedRight = Object.assign({}, compareExpression.right);
             }
-            console.log('Left Tree', decomposedLeft);
-            console.log('Right Tree', decomposedRight);
 
             const jsLine = this.constructJSLine(conditionExpression, compareExpression, decomposedLeft, decomposedRight);
             processedData.push(jsLine);
@@ -341,21 +337,12 @@ export class Luckytickets implements KioTask {
     }
 
     private constructJSLine(conditionExpression: ConditionExpression, compareExpression: CompareExpression, decomposedLeft: BaseToken, decomposedRight: BaseToken): string {
-        // const constructedLine = '';
-        this.resetJSExpression();
         const leftExpression = this.constructExpression(decomposedLeft);
-        this.resetJSExpression();
         const rightExpression = this.constructExpression(decomposedRight);
         const constructedLine = `${conditionExpression.condition}(${leftExpression}${compareExpression.comparator}${rightExpression})`;
-        // const constructedLine = `${conditionExpression.conditional}((${decomposedLeftComparable.operands[0]}${decomposedLeftComparable.operation}${decomposedLeftComparable.operands[1]})${comparatorFractionInstance.comparator}(${decomposedRightComparable.operands[0]}${decomposedRightComparable.operation}${decomposedRightComparable.operands[1]}))`;
         return constructedLine;
     }
 
-    private resetJSExpression() {
-        this.expr = '';
-    }
-
-    // private expr = '';
     private constructExpression(exprTree: any, rawParentOperator?: string): string {
         let expr = '';
         if (exprTree.operands.every((operand: any) => {
@@ -369,44 +356,17 @@ export class Luckytickets implements KioTask {
             const simpleExpressions = exprTree.operands.filter((operand: any) => {
                 return typeof operand === 'string';
             });
-            expr = expr + simpleExpressions.join(this.getJSOperator(exprTree.operation));
+            expr += simpleExpressions.join(this.getJSOperator(exprTree.operation));
             complexExpressions.forEach((entry: any) => {
                 const operatorNeeded = expr.length > 0 ? this.getJSOperator(exprTree.operation) : '';
-                expr = expr + operatorNeeded + this.constructExpression(entry);
+                expr += operatorNeeded + this.constructExpression(entry);
             });
-            console.log(expr);
-            return '(' + expr + ')';
+            return `(${expr})`;
         }
-        // return expr;
-        // const parentOperator = rawParentOperator ? this.getJSOperator(rawParentOperator) : '';
-        // this.expr = this.expr + '(';
-
-        // exprTree.operands.forEach((operand: any, index: number, operands: any[]) => {
-        //     if (typeof operand === 'string') {
-        //         if (index === 0) {
-        //             this.expr = this.expr + operand;
-        //         } else {
-        //             this.expr = this.expr + this.getJSOperator(exprTree.operation) + operand;
-        //         }
-        //     } else {
-        //         // if (rawParentOperator) {
-        //         this.expr = this.expr + this.getJSOperator(exprTree.operation);
-        //         // }
-        //         this.constructExpression(operand, exprTree.operation);
-        //     }
-        // });
-        // this.expr = this.expr + ')';
-        // return this.expr;
-    }
-
-    private isPrimitive(operand: any): boolean{
-        return typeof operand === 'string';
     }
 
     private getJSOperator(operation: string): string {
-        // const operationName = operation.toLowerCase();
-        const jsOperator = MathOperations[operation.toLowerCase()].jsOperator;
-        return jsOperator;
+        return MathOperations[operation.toLowerCase()].jsOperator;
     }
 
     private codeContainsOperator(codeLine: string): boolean {
