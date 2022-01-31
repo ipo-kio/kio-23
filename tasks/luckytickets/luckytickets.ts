@@ -248,7 +248,7 @@ export class Luckytickets implements KioTask {
     }
 
     private constructJSFunction(rawDataArray: string[]): string {
-        return this.processRawData(rawDataArray).join('');
+        return this.processRawData(rawDataArray).join(';');
     }
 
     private processRawData(rawDataArray: string[]): string[] {
@@ -347,18 +347,11 @@ export class Luckytickets implements KioTask {
         let expr = '';
         if (typeof exprTree === 'string') {
             return expr = exprTree;
-        } else if (exprTree.operands.every((operand: any) => {
+        } else if (exprTree?.operands && exprTree.operands.every((operand: any) => {
             return typeof operand === 'string';
         })) {
             return expr = `(${exprTree.operands.join(this.getJSOperator(exprTree.operation))})`;
-        } else {
-            // const complexExpressions = exprTree.operands.filter((operand: any) => {
-            //     return typeof operand !== 'string';
-            // });
-            // const simpleExpressions = exprTree.operands.filter((operand: any) => {
-            //     return typeof operand === 'string';
-            // });
-            // expr += simpleExpressions.join(this.getJSOperator(exprTree.operation));
+        } else if (exprTree?.operands) {
             exprTree.operands.forEach((entry: any) => {
                 const operatorNeeded = expr.length > 0 ? this.getJSOperator(exprTree.operation) : '';
                 expr += operatorNeeded + this.constructExpression(entry);
