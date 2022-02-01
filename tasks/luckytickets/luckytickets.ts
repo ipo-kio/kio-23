@@ -136,11 +136,11 @@ export class Luckytickets implements KioTask {
                     elem.style.display = 'none';
                 } else {
                     inputTicketImage.classList.add('invalid');
-                    elem.textContent   = 'Username should only contain lowercase letters e.g. john';
+                    elem.textContent   = 'Номер билета должен быть шестизначным числом';
                     elem.className = 'error';
                     elem.style.display = 'block';
                 }
-            } else if (!event.data) {
+            } else if (this.validInput(event)) {
                 inputTicketImage.classList.remove('invalid');
                 elem.style.display = 'none';
             }
@@ -242,8 +242,8 @@ export class Luckytickets implements KioTask {
         // Has to be number
         // Has to be within the range
         // Has to be different numbers depending on number system
-        return ticketNumber?.data && Number.isInteger(ticketNumber.data) && 
-        /^\d+$/.test(ticketNumber.data);
+        const inputValue = (<HTMLInputElement>ticketNumber.target).value;
+        return inputValue && Number.isInteger(+inputValue) && /^\d+$/.test(inputValue) || !inputValue;
     }
 
     private updateRuler(value: string): void {
