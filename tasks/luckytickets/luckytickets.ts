@@ -118,13 +118,31 @@ export class Luckytickets implements KioTask {
         inputTicketTitle.innerText = 'Текущий номер билета';
         inputTicketContainer.appendChild(inputTicketTitle);
 
-        const inputTicketImage = document.createElement('div');
+        const inputTicketImage = document.createElement('form');
         inputTicketImage.className = 'input-ticket-image';
         inputTicketImage.innerHTML = '<input maxlength="6" class="input-number" placeholder="abcdef">';
         inputTicketContainer.appendChild(inputTicketImage);
+        var elem = document.createElement('div');
+        elem.id = 'notify';
+        elem.style.display = 'none';
+  
+        inputTicketImage.appendChild(elem);
         inputTicketImage.addEventListener('input', (event: InputEvent) => {
+            console.log(event);
             if (event?.data) {
-                this.storedInput += event.data;
+                if (this.validInput(event)) {
+                    this.storedInput += event.data;
+                    inputTicketImage.classList.remove('invalid');
+                    elem.style.display = 'none';
+                } else {
+                    inputTicketImage.classList.add('invalid');
+                    elem.textContent   = 'Username should only contain lowercase letters e.g. john';
+                    elem.className = 'error';
+                    elem.style.display = 'block';
+                }
+            } else if (!event.data) {
+                inputTicketImage.classList.remove('invalid');
+                elem.style.display = 'none';
             }
         });
 
@@ -218,6 +236,14 @@ export class Luckytickets implements KioTask {
         buttonsContainer.appendChild(animationButton);
         animationButton.addEventListener('click', (event) => {
         });
+    }
+
+    private validInput(ticketNumber: InputEvent): boolean {
+        // Has to be number
+        // Has to be within the range
+        // Has to be different numbers depending on number system
+        return ticketNumber?.data && Number.isInteger(ticketNumber.data) && 
+        /^\d+$/.test(ticketNumber.data);
     }
 
     private updateRuler(value: string): void {
