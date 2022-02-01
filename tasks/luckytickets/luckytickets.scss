@@ -44,6 +44,8 @@
                     width: 100%;
                     color: #fff;
                     display: block;
+                    width: inherit;
+                    opacity: 0.9;
                   }
                   #notify.error {
                     background-color: #DD2C00;
