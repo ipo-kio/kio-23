@@ -34,5 +34,8 @@
     "compile-prod": "webpack --env mode=production"
   },
   "author": "Ilya Posov",
-  "license": "ISC"
+  "license": "ISC",
+  "dependencies": {
+    "blockly": "^7.20211209.2"
+  }
 }

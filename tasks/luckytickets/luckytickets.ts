@@ -1,5 +1,11 @@
 import './luckytickets.scss'
 import {KioApi, KioTask, KioParameterDescription, KioResourceDescription, KioTaskSettings} from "../KioApi";
+import * as Blockly from '../../node_modules/blockly/core';
+import '../../node_modules/blockly/blocks';
+import '../../node_modules/blockly/javascript';
+
+import * as Ru from '../../node_modules/blockly/msg/ru';
+(Blockly as any).setLocale(Ru);
 
 enum OperatorsList {
     IF = 'ЕСЛИ',
@@ -85,6 +91,7 @@ export class Luckytickets implements KioTask {
     private storedInput = '';
     private linesCount = 1;
     private linesArray = [1];
+    private blockly = Blockly;
     
     private complexExpressionTree: BaseToken = {
         operation: '',
@@ -236,6 +243,54 @@ export class Luckytickets implements KioTask {
         buttonsContainer.appendChild(animationButton);
         animationButton.addEventListener('click', (event) => {
         });
+
+        const blocklyEditor = document.createElement('div');
+            blocklyEditor.innerHTML = `
+        <div id='blocklyDiv'>
+        </div>
+        <button id="blocklyButton">Convert</button>
+
+        <xml xmlns="https://developers.google.com/blockly/xml" id="toolbox" style="display: none">
+            <block type="controls_ifelse"></block>
+            <block type="logic_compare"></block>
+            <block type="logic_operation"></block>
+            <block type="controls_repeat_ext">
+                <value name="TIMES">
+                    <shadow type="math_number">
+                        <field name="NUM">10</field>
+                    </shadow>
+                </value>
+            </block>
+            <block type="logic_operation"></block>
+            <block type="logic_negate"></block>
+            <block type="logic_boolean"></block>
+            <block type="logic_null" disabled="true"></block>
+            <block type="logic_ternary"></block>
+            <block type="text_charAt">
+                <value name="VALUE">
+                    <block type="variables_get">
+                        <field name="VAR">text</field>
+                    </block>
+                </value>
+            </block>
+        </xml>`;
+        this.domNode.appendChild(blocklyEditor);
+
+        // blocklyEditor.addEventListener("DOMContentLoaded", function () {
+        const workspace = Blockly.inject('blocklyDiv',
+            {
+                toolbox: document.getElementById('toolbox'),
+                media: 'luckytickets-resources/'
+            });
+    
+        const lang = 'JavaScript';
+        const button = document.getElementById('blocklyButton');
+        button.addEventListener('click', function () {
+            alert("Check the console for the generated output.");
+            const code = (Blockly as any)[lang].workspaceToCode(workspace);
+            console.log(code);
+        })
+        // });
     }
 
     private validInput(ticketNumber: InputEvent): boolean {

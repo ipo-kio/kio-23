@@ -167,11 +167,15 @@ function add_task_to_config(task_name, config, task_html_template, dist_folder) 
         new CopyWebpackPlugin({
             patterns: [
                 {
+                    from: path.resolve(__dirname, './node_modules/blockly/media'),
+                    to: path.resolve(__dirname, 'tasks', task_name, resources_folder_name)
+                },
+                {
                     from: '*',
                     to: './' + resources_folder_name,
                     context: path.resolve(__dirname, 'tasks', task_name, resources_folder_name),
                     noErrorOnMissing: true
-                },
+                }
             ]
         })
     );
