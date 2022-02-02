@@ -169,29 +169,74 @@ export class Luckytickets implements KioTask {
 
         ticketsContainer.appendChild(outputTicketContainer);
 
-        const codeEditor = document.createElement('div');
-        codeEditor.className = 'code-editor';
-        codeEditor.innerHTML = '<div class="code-editor-header" id="code-editor-header-id"></div><div class="code-lines" id="ruler"></div><textarea id="text-from-editor"></textarea>';
+        // const codeEditor = document.createElement('div');
+        // codeEditor.className = 'code-editor';
+        // codeEditor.innerHTML = '<div class="code-editor-header" id="code-editor-header-id"></div><div class="code-lines" id="ruler"></div><textarea id="text-from-editor"></textarea>';
 
-        this.domNode.appendChild(codeEditor);
+        // this.domNode.appendChild(codeEditor);
 
-        const infoIcon = document.createElement('div');
-        infoIcon.className = 'info-icon';
-        const editorHeader = document.getElementById('code-editor-header-id');
-        editorHeader.appendChild(infoIcon);
+        // const infoIcon = document.createElement('div');
+        // infoIcon.className = 'info-icon';
+        // const editorHeader = document.getElementById('code-editor-header-id');
+        // editorHeader.appendChild(infoIcon);
 
-        const editorElement = <HTMLTextAreaElement>document.getElementById('text-from-editor');
+        // const editorElement = <HTMLTextAreaElement>document.getElementById('text-from-editor');
         
-        if (editorElement) {
-            const ruler = document.getElementById('ruler');
-            ruler.innerHTML = `<div class="line-number" id="${this.linesArray[0].toString()}">${this.linesArray[0].toString()}</div>`;
-        }
-        editorElement.addEventListener('keydown', (event) => {
-            if (editorElement?.value) {
-                this.updateRuler(editorElement.value);
-            }
-        });
+        // if (editorElement) {
+        //     const ruler = document.getElementById('ruler');
+        //     ruler.innerHTML = `<div class="line-number" id="${this.linesArray[0].toString()}">${this.linesArray[0].toString()}</div>`;
+        // }
+        // editorElement.addEventListener('keydown', (event) => {
+        //     if (editorElement?.value) {
+        //         this.updateRuler(editorElement.value);
+        //     }
+        // });
 
+        const blocklyEditor = document.createElement('div');
+        blocklyEditor.className = 'code-editor';
+            blocklyEditor.innerHTML = `
+        <div id='blocklyDiv'>
+        </div>
+
+        <xml xmlns="https://developers.google.com/blockly/xml" id="toolbox" style="display: none">
+            <block type="controls_ifelse"></block>
+            <block type="logic_compare"></block>
+            <block type="logic_operation"></block>
+            <block type="controls_repeat_ext">
+                <value name="TIMES">
+                    <shadow type="math_number">
+                        <field name="NUM">10</field>
+                    </shadow>
+                </value>
+            </block>
+            <block type="logic_operation"></block>
+            <block type="logic_negate"></block>
+            <block type="logic_boolean"></block>
+            <block type="logic_null" disabled="true"></block>
+            <block type="logic_ternary"></block>
+            <block type="text_charAt">
+                <value name="VALUE">
+                    <block type="variables_get">
+                        <field name="VAR">text</field>
+                    </block>
+                </value>
+            </block>
+        </xml>`;
+        this.domNode.appendChild(blocklyEditor);
+
+        const workspace = Blockly.inject('blocklyDiv',
+            {
+                toolbox: document.getElementById('toolbox'),
+                media: 'luckytickets-resources/'
+            });
+        const lang = 'JavaScript';
+        // const button = document.getElementById('blocklyButton');
+        // button.addEventListener('click', function () {
+        //     alert("Check the console for the generated output.");
+        //     const code = (Blockly as any)[lang].workspaceToCode(workspace);
+        //     console.log(code);
+        // })
+        
         const buttonsContainer = document.createElement('div');
         buttonsContainer.className = 'buttons-container';
         this.domNode.appendChild(buttonsContainer);
@@ -228,13 +273,13 @@ export class Luckytickets implements KioTask {
         demoButton.className = 'demo-button';
         buttonsContainer.appendChild(demoButton);
         demoButton.addEventListener('click', () => {
-            if (editorElement?.value) {
-                const rawDataArray = this.splitLines(editorElement.value);
-                console.log('RAW DATA', rawDataArray);
-                const jsFunctionString = this.constructJSFunction(rawDataArray);
-                console.log('PROCESSED DATA', jsFunctionString);
-                this.callJSFunction(jsFunctionString);
-            }
+            // if (editorElement?.value) {
+            //     const rawDataArray = this.splitLines(editorElement.value);
+            //     console.log('RAW DATA', rawDataArray);
+            //     const jsFunctionString = this.constructJSFunction(rawDataArray);
+            //     console.log('PROCESSED DATA', jsFunctionString);
+            //     this.callJSFunction(jsFunctionString);
+            // }
         });
 
         const animationButton = document.createElement('button');
@@ -243,54 +288,6 @@ export class Luckytickets implements KioTask {
         buttonsContainer.appendChild(animationButton);
         animationButton.addEventListener('click', (event) => {
         });
-
-        const blocklyEditor = document.createElement('div');
-            blocklyEditor.innerHTML = `
-        <div id='blocklyDiv'>
-        </div>
-        <button id="blocklyButton">Convert</button>
-
-        <xml xmlns="https://developers.google.com/blockly/xml" id="toolbox" style="display: none">
-            <block type="controls_ifelse"></block>
-            <block type="logic_compare"></block>
-            <block type="logic_operation"></block>
-            <block type="controls_repeat_ext">
-                <value name="TIMES">
-                    <shadow type="math_number">
-                        <field name="NUM">10</field>
-                    </shadow>
-                </value>
-            </block>
-            <block type="logic_operation"></block>
-            <block type="logic_negate"></block>
-            <block type="logic_boolean"></block>
-            <block type="logic_null" disabled="true"></block>
-            <block type="logic_ternary"></block>
-            <block type="text_charAt">
-                <value name="VALUE">
-                    <block type="variables_get">
-                        <field name="VAR">text</field>
-                    </block>
-                </value>
-            </block>
-        </xml>`;
-        this.domNode.appendChild(blocklyEditor);
-
-        // blocklyEditor.addEventListener("DOMContentLoaded", function () {
-        const workspace = Blockly.inject('blocklyDiv',
-            {
-                toolbox: document.getElementById('toolbox'),
-                media: 'luckytickets-resources/'
-            });
-    
-        const lang = 'JavaScript';
-        const button = document.getElementById('blocklyButton');
-        button.addEventListener('click', function () {
-            alert("Check the console for the generated output.");
-            const code = (Blockly as any)[lang].workspaceToCode(workspace);
-            console.log(code);
-        })
-        // });
     }
 
     private validInput(ticketNumber: InputEvent): boolean {
