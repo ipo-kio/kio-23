@@ -223,6 +223,7 @@ export class Luckytickets implements KioTask {
         demoButton.addEventListener('click', () => {
             if (editorElement?.value) {
                 const rawDataArray = this.splitLines(editorElement.value);
+                console.log('RAW DATA', rawDataArray);
                 const jsFunctionString = this.constructJSFunction(rawDataArray);
                 console.log('PROCESSED DATA', jsFunctionString);
                 this.callJSFunction(jsFunctionString);
