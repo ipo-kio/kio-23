@@ -192,37 +192,76 @@ export class Luckytickets implements KioTask {
         //     }
         // });
 
-        const blocklyEditor = document.createElement('div');
-        blocklyEditor.className = 'code-editor';
-            blocklyEditor.innerHTML = `
-        <div id='blocklyDiv'>
-        </div>
+        const blocklyContainer = document.createElement('div');
+        blocklyContainer.className = 'code-editor';
 
-        <xml xmlns="https://developers.google.com/blockly/xml" id="toolbox" style="display: none">
-            <category name="ЕСЛИ" colour="%{BKY_LOGIC_HUE}">
-                <block type="controls_if"></block>
-                <block type="controls_if">
-                    <mutation else="1"></mutation>
-                </block>
-                <block type="controls_if">
-                    <mutation elseif="1" else="1"></mutation>
-                </block>
-                <block type="logic_compare"></block>
-            </category>
-            <category name="Операция" colour="%{BKY_MATH_HUE}">
-                <block type="math_number">
-                    <field name="NUM">123</field>
-                </block>
-                <block type="math_arithmetic"></block>
-                <block type="math_modulo"></block>
-            </category>
-            <category name="Переменные" custom="VARIABLE" colour="%{BKY_VARIABLES_HUE}"></category>
-        </xml>`;
-        this.domNode.appendChild(blocklyEditor);
+        const blocklyEditor = document.createElement('div');
+        blocklyEditor.id = 'blocklyDiv';
+        blocklyContainer.appendChild(blocklyEditor);
+        const toolbox = {
+            "kind": "flyoutToolbox",
+            "contents": [
+              {
+                "kind": "block",
+                "type": "controls_if"
+              },
+              {
+                "kind": "block",
+                "type": "controls_repeat_ext"
+              },
+              {
+                "kind": "block",
+                "type": "logic_compare"
+              },
+              {
+                "kind": "block",
+                "type": "math_number"
+              },
+              {
+                "kind": "block",
+                "type": "math_arithmetic"
+              },
+              {
+                "kind": "block",
+                "type": "text"
+              },
+              {
+                "kind": "block",
+                "type": "text_print"
+              },
+            ]
+          }
+
+
+        // blocklyEditor.innerHTML = `
+        // <div id='blocklyDiv'>
+        // </div>
+
+        // <xml xmlns="https://developers.google.com/blockly/xml" id="toolbox" style="display: none">
+        //     <category name="ЕСЛИ" colour="%{BKY_LOGIC_HUE}">
+        //         <block type="controls_if"></block>
+        //         <block type="controls_if">
+        //             <mutation else="1"></mutation>
+        //         </block>
+        //         <block type="controls_if">
+        //             <mutation elseif="1" else="1"></mutation>
+        //         </block>
+        //         <block type="logic_compare"></block>
+        //     </category>
+        //     <category name="Операция" colour="%{BKY_MATH_HUE}">
+        //         <block type="math_number">
+        //             <field name="NUM">123</field>
+        //         </block>
+        //         <block type="math_arithmetic"></block>
+        //         <block type="math_modulo"></block>
+        //     </category>
+        //     <category name="Переменные" custom="VARIABLE" colour="%{BKY_VARIABLES_HUE}"></category>
+        // </xml>`;
+        this.domNode.appendChild(blocklyContainer);
 
         const workspace = Blockly.inject('blocklyDiv',
             {
-                toolbox: document.getElementById('toolbox'),
+                toolbox: toolbox,
                 media: 'luckytickets-resources/'
             });
         const lang = 'JavaScript';
