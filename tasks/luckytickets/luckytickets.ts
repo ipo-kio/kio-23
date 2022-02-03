@@ -199,28 +199,24 @@ export class Luckytickets implements KioTask {
         </div>
 
         <xml xmlns="https://developers.google.com/blockly/xml" id="toolbox" style="display: none">
-            <block type="controls_ifelse"></block>
-            <block type="logic_compare"></block>
-            <block type="logic_operation"></block>
-            <block type="controls_repeat_ext">
-                <value name="TIMES">
-                    <shadow type="math_number">
-                        <field name="NUM">10</field>
-                    </shadow>
-                </value>
-            </block>
-            <block type="logic_operation"></block>
-            <block type="logic_negate"></block>
-            <block type="logic_boolean"></block>
-            <block type="logic_null" disabled="true"></block>
-            <block type="logic_ternary"></block>
-            <block type="text_charAt">
-                <value name="VALUE">
-                    <block type="variables_get">
-                        <field name="VAR">text</field>
-                    </block>
-                </value>
-            </block>
+            <category name="ЕСЛИ" colour="%{BKY_LOGIC_HUE}">
+                <block type="controls_if"></block>
+                <block type="controls_if">
+                    <mutation else="1"></mutation>
+                </block>
+                <block type="controls_if">
+                    <mutation elseif="1" else="1"></mutation>
+                </block>
+                <block type="logic_compare"></block>
+            </category>
+            <category name="Операция" colour="%{BKY_MATH_HUE}">
+                <block type="math_number">
+                    <field name="NUM">123</field>
+                </block>
+                <block type="math_arithmetic"></block>
+                <block type="math_modulo"></block>
+            </category>
+            <category name="Переменные" custom="VARIABLE" colour="%{BKY_VARIABLES_HUE}"></category>
         </xml>`;
         this.domNode.appendChild(blocklyEditor);
 
