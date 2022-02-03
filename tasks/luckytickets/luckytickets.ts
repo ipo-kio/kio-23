@@ -116,7 +116,23 @@ const ToolboxConfig = {
                 {
                     "kind": "block",
                     "type": "math_modulo"
-                }
+                },
+                // {
+                //     "kind:": "block",
+                //     "type": "variables_set",
+                //     "message0": "%{BKY_VARIABLES_SET}",
+                //     "args0": [
+                //         {
+                //         "type": "field_variable",
+                //         "name": "VAR",
+                //         "variable": "pppp"
+                //         },
+                //         {
+                //         "type": "input_value",    // This expects an input of any type
+                //         "name": "VALUE"
+                //         }
+                //     ],
+                // }
             ]
         },
         {
@@ -124,7 +140,49 @@ const ToolboxConfig = {
             "name": "Переменные",
             "colour": "%{BKY_VARIABLES_HUE}",
             "custom": "VARIABLE",
+        },
+        {
+            "kind": "category",
+            "name": "Заданные переменные",
+            "colour": "Green",
+            "contents": [
+                // {
+                //     'kind': 'block',
+                //     'type': 'variables_set'
+                // },
+                // {
+                //     'kind': 'block',
+                //     'type': 'variables_get'
+                // },
+                {
+                    'kind': 'block',
+                    "type": "variables_set",
+                    "message0": "%{BKY_VARIABLES_SET}",
+                    "args0": [
+                        {
+                            'type': 'field_variable',
+                            'name': 'VAR',
+                            'variable': '%{BKY_VARIABLES_DEFAULT_NAME}',
+                        },
+                        {
+                            'type': 'input_value',
+                            'name': 'VALUE',
+                        },
+                    ],
+                }
+            ]
         }
+        // {
+        //     "type": "example_variable_untyped",
+        //     "message0": "variable: %1",
+        //     "args0": [
+        //         {
+        //             "type": "field_variable",
+        //             "name": "FIELDNAME",
+        //             "variable": "x"
+        //         }
+        //     ]
+        // }
     ]
 }
 export class Luckytickets implements KioTask {
@@ -255,6 +313,20 @@ export class Luckytickets implements KioTask {
         //     const code = (Blockly as any)[lang].workspaceToCode(workspace);
         //     console.log(code);
         // })
+
+        (Blockly as any).Blocks['string_length'] = {
+            init: function() {
+              this.appendValueInput('VALUE')
+                  .setCheck('String')
+                  .appendField('length of');
+              this.setOutput(true, 'Number');
+              this.setColour(160);
+              this.setTooltip('Returns number of letters in the provided text.');
+              this.setHelpUrl('http://www.w3schools.com/jsref/jsref_length_string.asp');
+            }
+        };
+
+        workspace.newBlock('string_length');
         
         const buttonsContainer = document.createElement('div');
         buttonsContainer.className = 'buttons-container';
@@ -287,11 +359,54 @@ export class Luckytickets implements KioTask {
         stepMinusButton.addEventListener('click', (event) => {
         });
 
+
         const demoButton = document.createElement('button');
         demoButton.innerText = 'ЗАПУСК';
         demoButton.className = 'demo-button';
         buttonsContainer.appendChild(demoButton);
+
+        (Blockly as any).Blocks['generic_block'] = {
+            init: function() {
+              this.jsonInit({
+                message0: '',
+                colour: '230'
+              });
+            }
+          };
+          var lineBlock = workspace.newBlock('generic_block');         // create new instance of generic block
+          var input = lineBlock.appendDummyInput();                               // create a dummy input
+          var blockText="Hello %s WorldHello %s WorldHello %s WorldHello %s WorldHello %s WorldHello %s WorldHello %s WorldHello %s WorldHello %s WorldHello %s WorldHello %s WorldHello %s WorldHello %s WorldHello %s WorldHello %s WorldHello %s WorldHello %s WorldHello %s WorldHello %s WorldHello %s WorldHello %s WorldHello %s WorldHello %s WorldHello %s WorldHello %s WorldHello %s WorldHello %s WorldHello %s WorldHello %s WorldHello %s WorldHello %s WorldHello %s WorldHello %s WorldHello %s WorldHello %s WorldHello %s WorldHello %s WorldHello %s WorldHello %s WorldHello %s WorldHello %s WorldHello %s WorldHello %s WorldHello %s WorldHello %s WorldHello %s WorldHello %s WorldHello %s WorldHello %s WorldHello %s WorldHello %s WorldHello %s WorldHello %s WorldHello %s WorldHello %s World";                                       // one line of the JS code
+          var currentLine = blockText.split(/(%s)/);                            // split every word
+          for( var y = 0; y < currentLine.length; y++ ) {                       // loop through each word
+              if(currentLine[y]==='%s') {                                         // if the word is %s, then append input field
+                  input.appendField(new Blockly.FieldTextInput('input'+y));         // input+y is the name of the field
+              } else {                                                                         // else just append label field
+                  var labelField = new (Blockly as any).FieldLabel('label'+y);                         // label+y is the name of the field
+                  labelField.setValue(currentLine[y]);                                          // set the label value to the word
+                  input.appendField(labelField)
+              }
+          }
         demoButton.addEventListener('click', () => {
+            var lineBlock = workspace.newBlock('generic_block');         // create new instance of generic block
+            var input=lineBlock.appendDummyInput();                               // create a dummy input
+            var blockText="Hello %s WorldHello %s WorldHello %s WorldHello %s WorldHello %s WorldHello %s WorldHello %s WorldHello %s WorldHello %s WorldHello %s WorldHello %s WorldHello %s WorldHello %s WorldHello %s WorldHello %s WorldHello %s WorldHello %s WorldHello %s WorldHello %s WorldHello %s WorldHello %s WorldHello %s WorldHello %s WorldHello %s WorldHello %s WorldHello %s WorldHello %s WorldHello %s WorldHello %s WorldHello %s WorldHello %s WorldHello %s WorldHello %s WorldHello %s WorldHello %s WorldHello %s WorldHello %s WorldHello %s WorldHello %s WorldHello %s WorldHello %s WorldHello %s WorldHello %s WorldHello %s WorldHello %s WorldHello %s WorldHello %s WorldHello %s WorldHello %s WorldHello %s WorldHello %s WorldHello %s WorldHello %s WorldHello %s WorldHello %s World";                                       // one line of the JS code
+            var currentLine = blockText.split(/(%s)/);                            // split every word
+            for( var y = 0; y < currentLine.length; y++ ) {                       // loop through each word
+                if(currentLine[y]==='%s') {                                         // if the word is %s, then append input field
+                    input.appendField(new Blockly.FieldTextInput('input'+y));         // input+y is the name of the field
+                } else {                                                                         // else just append label field
+                    var labelField = new (Blockly as any).FieldLabel('label'+y);                         // label+y is the name of the field
+                    labelField.setValue(currentLine[y]);                                          // set the label value to the word
+                    input.appendField(labelField)
+                }
+            }
+            // var code = (Blockly as any).JavaScript.workspaceToCode(workspace);
+            // console.log(code);
+            // document.getElementById('textarea').value = code;
+            // var myblocks = (Blockly as any).mainWorkspace.getAllBlocks();
+            // for (var i=0; i<myblocks.length; i++){
+            //     console.log(myblocks[i].getFieldValue('fieldName'));
+            // }
             // if (editorElement?.value) {
             //     const rawDataArray = this.splitLines(editorElement.value);
             //     console.log('RAW DATA', rawDataArray);
@@ -300,6 +415,20 @@ export class Luckytickets implements KioTask {
             //     this.callJSFunction(jsFunctionString);
             // }
         });
+
+        var parentBlock = workspace.newBlock('text_print');
+        parentBlock.initSvg();
+        parentBlock.render();
+
+        var childBlock = workspace.newBlock('text');
+
+        childBlock.setFieldValue('Hello', 'TEXT');
+        childBlock.initSvg();
+        childBlock.render();
+
+        var parentConnection = parentBlock.getInput('TEXT').connection;
+        var childConnection = childBlock.outputConnection;
+        parentConnection.connect(childConnection);
 
         const animationButton = document.createElement('button');
         animationButton.innerText = 'АНИМАЦИЯ ПЕРЕБОРА';
