@@ -5,6 +5,7 @@ import '../../node_modules/blockly/blocks';
 import '../../node_modules/blockly/javascript';
 
 import * as Ru from '../../node_modules/blockly/msg/ru';
+
 (Blockly as any).setLocale(Ru);
 
 enum OperatorsList {
@@ -23,6 +24,7 @@ enum OperatorsList {
     DIVISION = '/',
     POW = '^'
 }
+
 interface AllowedOperations {
     [key: string]: PrimitiveOperation;
 }
@@ -60,6 +62,7 @@ const MathOperations: AllowedOperations = {
         jsOperator: '**'
     }
 }
+
 interface MathOperator {
     operation: string;
     userOperator: string;
@@ -185,6 +188,181 @@ const ToolboxConfig = {
         // }
     ]
 }
+
+function create_blockly_workspace(blocklyEditor: HTMLDivElement) {
+    Blockly.defineBlocksWithJsonArray([
+        {
+            'type': 'lucky_controls_if',
+            'message0': 'Если %1',
+            'args0': [
+                {
+                    'type': 'input_value',
+                    'name': 'IF0',
+                    'check': 'Boolean',
+                },
+            ],
+            'message1': 'Выполнить %1',
+            'args1': [
+                {
+                    'type': 'input_statement',
+                    'name': 'DO0',
+                },
+            ],
+            'previousStatement': null,
+            'nextStatement': null,
+            'style': 'logic_blocks',
+            'suppressPrefixSuffix': true,
+            'mutator': 'controls_if_mutator',
+            'extensions': ['controls_if_tooltip'],
+        },
+        // If/else block that does not use a mutator.
+        {
+            'type': 'lucky_controls_ifelse',
+            'message0': '%{BKY_CONTROLS_IF_MSG_IF} %1',
+            'args0': [
+                {
+                    'type': 'input_value',
+                    'name': 'IF0',
+                    'check': 'Boolean',
+                },
+            ],
+            'message1': '%{BKY_CONTROLS_IF_MSG_THEN} %1',
+            'args1': [
+                {
+                    'type': 'input_statement',
+                    'name': 'DO0',
+                },
+            ],
+            'message2': '%{BKY_CONTROLS_IF_MSG_ELSE} %1',
+            'args2': [
+                {
+                    'type': 'input_statement',
+                    'name': 'ELSE',
+                },
+            ],
+            'previousStatement': null,
+            'nextStatement': null,
+            'style': 'logic_blocks',
+            'tooltip': '%{BKY_CONTROLS_IF_TOOLTIP_2}',
+            'helpUrl': '%{BKY_CONTROLS_IF_HELPURL}',
+            'suppressPrefixSuffix': true,
+            'extensions': ['controls_if_tooltip'],
+        },
+        {
+            'type': 'lucky_math_arithmetic',
+            'message0': '%1 %2 %3',
+            'args0': [
+                {
+                    'type': 'input_value',
+                    'name': 'A',
+                    'check': 'Number',
+                },
+                {
+                    'type': 'field_dropdown',
+                    'name': 'OP',
+                    'options': [
+                        ['+', 'ADD'],
+                        ['-', 'MINUS'],
+                        ['*', 'MULTIPLY']
+                    ],
+                },
+                {
+                    'type': 'input_value',
+                    'name': 'B',
+                    'check': 'Number',
+                },
+            ],
+            'inputsInline': true,
+            'output': 'Number',
+            'style': 'math_blocks',
+            'extensions': ['math_op_tooltip']
+        },
+        {
+            'type': 'lucky_variables_get',
+            'message0': '%1',
+            'args0': [
+                {
+                    'type': 'field_dropdown',
+                    'name': 'VAR',
+                    'options': [
+                        ['А', 'a'],
+                        ['Б', 'b'],
+                        ['В', 'c'],
+                        ['Г', 'd'],
+                        ['Д', 'e'],
+                        ['Е', 'f']
+                    ]
+                },
+            ],
+            'output': 'Number',
+            'style': 'variable_blocks',
+            'tooltip': '%{BKY_VARIABLES_GET_TOOLTIP}',
+            'extensions': ['contextMenu_variableSetterGetter'],
+        },
+        {
+            'type': 'lucky_variables_set',
+            'message0': '%{BKY_VARIABLES_SET}',
+            'args0': [
+                {
+                    'type': 'field_dropdown',
+                    'name': 'VAR',
+                    'options': [
+                        ['А', 'a'],
+                        ['Б', 'b'],
+                        ['В', 'c'],
+                        ['Г', 'd'],
+                        ['Д', 'e'],
+                        ['Е', 'f']
+                    ]
+                },
+                {
+                    'type': 'input_value',
+                    'name': 'VALUE',
+                },
+            ],
+            'previousStatement': null,
+            'nextStatement': null,
+            'style': 'variable_blocks',
+            'tooltip': '%{BKY_VARIABLES_SET_TOOLTIP}',
+            'extensions': ['contextMenu_variableSetterGetter']
+        },
+    ]);
+
+
+    const workspace = Blockly.inject('blocklyDiv',
+        {
+            toolbox: {
+                "kind": "flyoutToolbox",
+                "contents": [
+                    {
+                        "kind": "block",
+                        "type": "lucky_controls_if"
+                    },
+                    {
+                        "kind": "block",
+                        "type": "lucky_controls_ifelse",
+                    },
+                    {
+                        "kind": "block",
+                        "type": "lucky_math_arithmetic",
+                    },
+                    {
+                        "kind": "block",
+                        "type": "lucky_variables_get",
+                    },
+                    {
+                        "kind": "block",
+                        "type": "lucky_variables_set",
+                    },
+                ]
+            },
+            media: 'luckytickets-resources/'
+        });
+
+
+    return workspace;
+}
+
 export class Luckytickets implements KioTask {
     private settings: KioTaskSettings;
     private kioapi: KioApi;
@@ -193,7 +371,7 @@ export class Luckytickets implements KioTask {
     private linesCount = 1;
     private linesArray = [1];
     private blockly = Blockly;
-    
+
     private complexExpressionTree: BaseToken = {
         operation: '',
         operands: []
@@ -233,7 +411,7 @@ export class Luckytickets implements KioTask {
         var elem = document.createElement('div');
         elem.id = 'notify';
         elem.style.display = 'none';
-  
+
         inputTicketImage.appendChild(elem);
         inputTicketImage.addEventListener('input', (event: InputEvent) => {
             if (event?.data) {
@@ -243,7 +421,7 @@ export class Luckytickets implements KioTask {
                     elem.style.display = 'none';
                 } else {
                     inputTicketImage.classList.add('invalid');
-                    elem.textContent   = 'Номер билета должен быть шестизначным числом';
+                    elem.textContent = 'Номер билета должен быть шестизначным числом';
                     elem.className = 'error';
                     elem.style.display = 'block';
                 }
@@ -282,7 +460,7 @@ export class Luckytickets implements KioTask {
         // editorHeader.appendChild(infoIcon);
 
         // const editorElement = <HTMLTextAreaElement>document.getElementById('text-from-editor');
-        
+
         // if (editorElement) {
         //     const ruler = document.getElementById('ruler');
         //     ruler.innerHTML = `<div class="line-number" id="${this.linesArray[0].toString()}">${this.linesArray[0].toString()}</div>`;
@@ -301,11 +479,7 @@ export class Luckytickets implements KioTask {
         blocklyContainer.appendChild(blocklyEditor);
         this.domNode.appendChild(blocklyContainer);
 
-        const workspace = Blockly.inject('blocklyDiv',
-            {
-                toolbox: ToolboxConfig,
-                media: 'luckytickets-resources/'
-            });
+        const workspace = create_blockly_workspace(blocklyEditor);
         const lang = 'JavaScript';
         // const button = document.getElementById('blocklyButton');
         // button.addEventListener('click', function () {
@@ -315,19 +489,19 @@ export class Luckytickets implements KioTask {
         // })
 
         (Blockly as any).Blocks['string_length'] = {
-            init: function() {
-              this.appendValueInput('VALUE')
-                  .setCheck('String')
-                  .appendField('length of');
-              this.setOutput(true, 'Number');
-              this.setColour(160);
-              this.setTooltip('Returns number of letters in the provided text.');
-              this.setHelpUrl('http://www.w3schools.com/jsref/jsref_length_string.asp');
+            init: function () {
+                this.appendValueInput('VALUE')
+                    .setCheck('String')
+                    .appendField('length of');
+                this.setOutput(true, 'Number');
+                this.setColour(160);
+                this.setTooltip('Returns number of letters in the provided text.');
+                this.setHelpUrl('http://www.w3schools.com/jsref/jsref_length_string.asp');
             }
         };
 
         workspace.newBlock('string_length');
-        
+
         const buttonsContainer = document.createElement('div');
         buttonsContainer.className = 'buttons-container';
         this.domNode.appendChild(buttonsContainer);
@@ -366,36 +540,36 @@ export class Luckytickets implements KioTask {
         buttonsContainer.appendChild(demoButton);
 
         (Blockly as any).Blocks['generic_block'] = {
-            init: function() {
-              this.jsonInit({
-                message0: '',
-                colour: '230'
-              });
+            init: function () {
+                this.jsonInit({
+                    message0: '',
+                    colour: '230'
+                });
             }
-          };
-          var lineBlock = workspace.newBlock('generic_block');         // create new instance of generic block
-          var input = lineBlock.appendDummyInput();                               // create a dummy input
-          var blockText="Hello %s WorldHello %s WorldHello %s WorldHello %s WorldHello %s WorldHello %s WorldHello %s WorldHello %s WorldHello %s WorldHello %s WorldHello %s WorldHello %s WorldHello %s WorldHello %s WorldHello %s WorldHello %s WorldHello %s WorldHello %s WorldHello %s WorldHello %s WorldHello %s WorldHello %s WorldHello %s WorldHello %s WorldHello %s WorldHello %s WorldHello %s WorldHello %s WorldHello %s WorldHello %s WorldHello %s WorldHello %s WorldHello %s WorldHello %s WorldHello %s WorldHello %s WorldHello %s WorldHello %s WorldHello %s WorldHello %s WorldHello %s WorldHello %s WorldHello %s WorldHello %s WorldHello %s WorldHello %s WorldHello %s WorldHello %s WorldHello %s WorldHello %s WorldHello %s WorldHello %s WorldHello %s WorldHello %s WorldHello %s World";                                       // one line of the JS code
-          var currentLine = blockText.split(/(%s)/);                            // split every word
-          for( var y = 0; y < currentLine.length; y++ ) {                       // loop through each word
-              if(currentLine[y]==='%s') {                                         // if the word is %s, then append input field
-                  input.appendField(new Blockly.FieldTextInput('input'+y));         // input+y is the name of the field
-              } else {                                                                         // else just append label field
-                  var labelField = new (Blockly as any).FieldLabel('label'+y);                         // label+y is the name of the field
-                  labelField.setValue(currentLine[y]);                                          // set the label value to the word
-                  input.appendField(labelField)
-              }
-          }
+        };
+        var lineBlock = workspace.newBlock('generic_block');         // create new instance of generic block
+        var input = lineBlock.appendDummyInput();                               // create a dummy input
+        var blockText = "Hello %s WorldHello %s WorldHello %s WorldHello %s WorldHello %s WorldHello %s WorldHello %s WorldHello %s WorldHello %s WorldHello %s WorldHello %s WorldHello %s WorldHello %s WorldHello %s WorldHello %s WorldHello %s WorldHello %s WorldHello %s WorldHello %s WorldHello %s WorldHello %s WorldHello %s WorldHello %s WorldHello %s WorldHello %s WorldHello %s WorldHello %s WorldHello %s WorldHello %s WorldHello %s WorldHello %s WorldHello %s WorldHello %s WorldHello %s WorldHello %s WorldHello %s WorldHello %s WorldHello %s WorldHello %s WorldHello %s WorldHello %s WorldHello %s WorldHello %s WorldHello %s WorldHello %s WorldHello %s WorldHello %s WorldHello %s WorldHello %s WorldHello %s WorldHello %s WorldHello %s WorldHello %s WorldHello %s WorldHello %s World";                                       // one line of the JS code
+        var currentLine = blockText.split(/(%s)/);                            // split every word
+        for (var y = 0; y < currentLine.length; y++) {                       // loop through each word
+            if (currentLine[y] === '%s') {                                         // if the word is %s, then append input field
+                input.appendField(new Blockly.FieldTextInput('input' + y));         // input+y is the name of the field
+            } else {                                                                         // else just append label field
+                var labelField = new (Blockly as any).FieldLabel('label' + y);                         // label+y is the name of the field
+                labelField.setValue(currentLine[y]);                                          // set the label value to the word
+                input.appendField(labelField)
+            }
+        }
         demoButton.addEventListener('click', () => {
             var lineBlock = workspace.newBlock('generic_block');         // create new instance of generic block
-            var input=lineBlock.appendDummyInput();                               // create a dummy input
-            var blockText="Hello %s WorldHello %s WorldHello %s WorldHello %s WorldHello %s WorldHello %s WorldHello %s WorldHello %s WorldHello %s WorldHello %s WorldHello %s WorldHello %s WorldHello %s WorldHello %s WorldHello %s WorldHello %s WorldHello %s WorldHello %s WorldHello %s WorldHello %s WorldHello %s WorldHello %s WorldHello %s WorldHello %s WorldHello %s WorldHello %s WorldHello %s WorldHello %s WorldHello %s WorldHello %s WorldHello %s WorldHello %s WorldHello %s WorldHello %s WorldHello %s WorldHello %s WorldHello %s WorldHello %s WorldHello %s WorldHello %s WorldHello %s WorldHello %s WorldHello %s WorldHello %s WorldHello %s WorldHello %s WorldHello %s WorldHello %s WorldHello %s WorldHello %s WorldHello %s WorldHello %s WorldHello %s WorldHello %s WorldHello %s World";                                       // one line of the JS code
+            var input = lineBlock.appendDummyInput();                               // create a dummy input
+            var blockText = "Hello %s WorldHello %s WorldHello %s WorldHello %s WorldHello %s WorldHello %s WorldHello %s WorldHello %s WorldHello %s WorldHello %s WorldHello %s WorldHello %s WorldHello %s WorldHello %s WorldHello %s WorldHello %s WorldHello %s WorldHello %s WorldHello %s WorldHello %s WorldHello %s WorldHello %s WorldHello %s WorldHello %s WorldHello %s WorldHello %s WorldHello %s WorldHello %s WorldHello %s WorldHello %s WorldHello %s WorldHello %s WorldHello %s WorldHello %s WorldHello %s WorldHello %s WorldHello %s WorldHello %s WorldHello %s WorldHello %s WorldHello %s WorldHello %s WorldHello %s WorldHello %s WorldHello %s WorldHello %s WorldHello %s WorldHello %s WorldHello %s WorldHello %s WorldHello %s WorldHello %s WorldHello %s WorldHello %s WorldHello %s World";                                       // one line of the JS code
             var currentLine = blockText.split(/(%s)/);                            // split every word
-            for( var y = 0; y < currentLine.length; y++ ) {                       // loop through each word
-                if(currentLine[y]==='%s') {                                         // if the word is %s, then append input field
-                    input.appendField(new Blockly.FieldTextInput('input'+y));         // input+y is the name of the field
+            for (var y = 0; y < currentLine.length; y++) {                       // loop through each word
+                if (currentLine[y] === '%s') {                                         // if the word is %s, then append input field
+                    input.appendField(new Blockly.FieldTextInput('input' + y));         // input+y is the name of the field
                 } else {                                                                         // else just append label field
-                    var labelField = new (Blockly as any).FieldLabel('label'+y);                         // label+y is the name of the field
+                    var labelField = new (Blockly as any).FieldLabel('label' + y);                         // label+y is the name of the field
                     labelField.setValue(currentLine[y]);                                          // set the label value to the word
                     input.appendField(labelField)
                 }
@@ -446,239 +620,265 @@ export class Luckytickets implements KioTask {
         return inputValue && Number.isInteger(+inputValue) && /^\d+$/.test(inputValue) || !inputValue;
     }
 
-    private updateRuler(value: string): void {
-        const ruler = document.getElementById('ruler');
-        const lines = value.split(/\r*\n/);
-        this.linesCount = lines.length;
+    /*
+        private updateRuler(value: string): void {
+            const ruler = document.getElementById('ruler');
+            const lines = value.split(/\r*\n/);
+            this.linesCount = lines.length;
 
-        if (this.linesArray[this.linesArray.length - 1] === this.linesCount) {
-            return;
-        } else if (this.linesCount < this.linesArray[this.linesArray.length - 1]) {
-            ruler.removeChild(ruler.lastChild);
-            this.linesArray.pop();
-            return;
+            if (this.linesArray[this.linesArray.length - 1] === this.linesCount) {
+                return;
+            } else if (this.linesCount < this.linesArray[this.linesArray.length - 1]) {
+                ruler.removeChild(ruler.lastChild);
+                this.linesArray.pop();
+                return;
+            }
+            this.linesArray.push(this.linesCount);
+            const elem = document.createElement("div");
+            elem.setAttribute('id', this.linesCount.toString());
+            elem.className = 'line-number';
+            elem.innerText = this.linesCount.toString();
+            ruler.appendChild(elem);
         }
-        this.linesArray.push(this.linesCount);
-        const elem = document.createElement("div");
-        elem.setAttribute('id', this.linesCount.toString());
-        elem.className = 'line-number';
-        elem.innerText = this.linesCount.toString();
-        ruler.appendChild(elem);
-    }
+    */
 
-    private splitLines(editorValue: string): string[] {
-        return editorValue.split(/\r*\n/);
-    }
+    /*
+        private splitLines(editorValue: string): string[] {
+            return editorValue.split(/\r*\n/);
+        }
+    */
 
-    private constructJSFunction(rawDataArray: string[]): string {
+    /*private constructJSFunction(rawDataArray: string[]): string {
         return this.processRawData(rawDataArray).join('');
-    }
+    }*/
 
-    private processRawData(rawDataArray: string[]): string[] {
-        const processedData: string[] = [];
-        rawDataArray.forEach((rawLine) => {
-            const conditionExpression: ConditionExpression = this.buildCondition(rawLine);
-            const compareExpression: CompareExpression = this.buildCompare(conditionExpression);
+    /*
+        private processRawData(rawDataArray: string[]): string[] {
+            const processedData: string[] = [];
+            rawDataArray.forEach((rawLine) => {
+                const conditionExpression: ConditionExpression = this.buildCondition(rawLine);
+                const compareExpression: CompareExpression = this.buildCompare(conditionExpression);
 
-            let decomposedLeft: any;
-            if (this.codeContainsOperator(compareExpression.left)) {
-                this.initTree();
-                this.keepDecomposing(compareExpression.left);
-                decomposedLeft = Object.assign({}, this.complexExpressionTree);
-            } else {
-                decomposedLeft = compareExpression.left;
-            }
-
-            let decomposedRight: any;
-            if (this.codeContainsOperator(compareExpression.right)) {
-                this.initTree();
-                this.keepDecomposing(compareExpression.right);
-                decomposedRight = this.complexExpressionTree;
-            } else {
-                decomposedRight = Object.assign({}, compareExpression.right);
-            }
-
-            const jsLine = this.constructJSLine(conditionExpression, compareExpression, decomposedLeft, decomposedRight);
-            processedData.push(jsLine);
-        });
-        return processedData;
-    }
-
-    private initTree() {
-        this.complexExpressionTree.operation = '';
-        this.complexExpressionTree.operands = [];
-    }
-
-    private keepDecomposing(rawExpression: string, currentIndex?: number, parentIndex?: number) {
-        const lineWithoutSpaces = rawExpression.split(' ').join('');
-        if (lineWithoutSpaces.includes(OperatorsList.PLUS)) {
-            this.buildTree(lineWithoutSpaces, MathOperations.sum, parentIndex, currentIndex);
-        } else if (lineWithoutSpaces.includes(OperatorsList.MINUS)) {
-            this.buildTree(lineWithoutSpaces, MathOperations.subtr, parentIndex, currentIndex);
-        } else if (lineWithoutSpaces.includes(OperatorsList.MULT)) {
-            this.buildTree(lineWithoutSpaces, MathOperations.mult, parentIndex, currentIndex);
-        } else if (lineWithoutSpaces.includes(OperatorsList.DIVISION)) {
-            this.buildTree(lineWithoutSpaces, MathOperations.division, parentIndex, currentIndex);
-        } else if (lineWithoutSpaces.includes(OperatorsList.POW)) {
-            this.buildTree(lineWithoutSpaces, MathOperations.power, parentIndex, currentIndex);
-        }
-    }
-
-    private buildTree(lineWithoutSpaces: string, mathOperator: MathOperator, parentIndex: number, currentIndex: number) {
-        const operands = this.findOperands(lineWithoutSpaces, mathOperator.userOperator);
-        if (parentIndex === undefined && currentIndex === undefined) {
-            this.complexExpressionTree = {
-                operation: mathOperator.operation,
-                operands
-            }
-            operands.forEach((operand, index) => {
-                if (this.codeContainsOperator(operand)) {
-                    this.keepDecomposing(operand, index);
+                let decomposedLeft: any;
+                if (this.codeContainsOperator(compareExpression.left)) {
+                    this.initTree();
+                    this.keepDecomposing(compareExpression.left);
+                    decomposedLeft = Object.assign({}, this.complexExpressionTree);
+                } else {
+                    decomposedLeft = compareExpression.left;
                 }
-            });
-        } else if (currentIndex !== undefined && parentIndex === undefined) {
-            this.complexExpressionTree.operands[currentIndex] = {
-                operation: mathOperator.operation,
-                operands
-            }
-            operands.forEach((operand, index) => {
-                if (this.codeContainsOperator(operand)) {
-                    this.keepDecomposing(operand, index, currentIndex);
-                }
-            });
-        } else if (parentIndex !== undefined && currentIndex !== undefined) {
-            this.complexExpressionTree.operands[parentIndex].operands[currentIndex] = {
-                operation: mathOperator.operation,
-                operands
-            }
-            operands.forEach((operand, index) => {
-                if (this.codeContainsOperator(operand)) {
-                    this.keepDecomposing(operand, index, parentIndex);
-                }
-            });
-        }
-    }
 
-    private constructJSLine(conditionExpression: ConditionExpression, compareExpression: CompareExpression, decomposedLeft: BaseToken, decomposedRight: BaseToken): string {
-        const leftExpression = this.constructExpression(decomposedLeft);
-        const rightExpression = this.constructExpression(decomposedRight);
-        let constructedLine = '';
-        if (conditionExpression.condition === 'if') {
-            constructedLine = `${conditionExpression.condition}(${leftExpression}${compareExpression.comparator}${rightExpression})`;
-        } else if (conditionExpression.condition === 'then') {
-            constructedLine = `{${leftExpression}${compareExpression.comparator}${rightExpression}}`;
-        } else if (conditionExpression.condition === 'else') {
-            constructedLine = `${conditionExpression.condition}{${leftExpression}${compareExpression.comparator}${rightExpression}}`;
-        }
-        return constructedLine;
-    }
+                let decomposedRight: any;
+                if (this.codeContainsOperator(compareExpression.right)) {
+                    this.initTree();
+                    this.keepDecomposing(compareExpression.right);
+                    decomposedRight = this.complexExpressionTree;
+                } else {
+                    decomposedRight = Object.assign({}, compareExpression.right);
+                }
 
-    private constructExpression(exprTree: any): string {
-        let expr = '';
-        if (typeof exprTree === 'string') {
-            return expr = exprTree;
-        } else if (exprTree?.operands && exprTree.operands.every((operand: any) => {
-            return typeof operand === 'string';
-        })) {
-            return expr = `(${exprTree.operands.join(this.getJSOperator(exprTree.operation))})`;
-        } else if (exprTree?.operands) {
-            exprTree.operands.forEach((entry: any) => {
-                const operatorNeeded = expr.length > 0 ? this.getJSOperator(exprTree.operation) : '';
-                expr += operatorNeeded + this.constructExpression(entry);
+                const jsLine = this.constructJSLine(conditionExpression, compareExpression, decomposedLeft, decomposedRight);
+                processedData.push(jsLine);
             });
-            return `(${expr})`;
+            return processedData;
         }
-    }
+    */
+
+    /*
+        private initTree() {
+            this.complexExpressionTree.operation = '';
+            this.complexExpressionTree.operands = [];
+        }
+    */
+
+    /*
+        private keepDecomposing(rawExpression: string, currentIndex?: number, parentIndex?: number) {
+            const lineWithoutSpaces = rawExpression.split(' ').join('');
+            if (lineWithoutSpaces.includes(OperatorsList.PLUS)) {
+                this.buildTree(lineWithoutSpaces, MathOperations.sum, parentIndex, currentIndex);
+            } else if (lineWithoutSpaces.includes(OperatorsList.MINUS)) {
+                this.buildTree(lineWithoutSpaces, MathOperations.subtr, parentIndex, currentIndex);
+            } else if (lineWithoutSpaces.includes(OperatorsList.MULT)) {
+                this.buildTree(lineWithoutSpaces, MathOperations.mult, parentIndex, currentIndex);
+            } else if (lineWithoutSpaces.includes(OperatorsList.DIVISION)) {
+                this.buildTree(lineWithoutSpaces, MathOperations.division, parentIndex, currentIndex);
+            } else if (lineWithoutSpaces.includes(OperatorsList.POW)) {
+                this.buildTree(lineWithoutSpaces, MathOperations.power, parentIndex, currentIndex);
+            }
+        }
+    */
+
+    /*
+        private buildTree(lineWithoutSpaces: string, mathOperator: MathOperator, parentIndex: number, currentIndex: number) {
+            const operands = this.findOperands(lineWithoutSpaces, mathOperator.userOperator);
+            if (parentIndex === undefined && currentIndex === undefined) {
+                this.complexExpressionTree = {
+                    operation: mathOperator.operation,
+                    operands
+                }
+                operands.forEach((operand, index) => {
+                    if (this.codeContainsOperator(operand)) {
+                        this.keepDecomposing(operand, index);
+                    }
+                });
+            } else if (currentIndex !== undefined && parentIndex === undefined) {
+                this.complexExpressionTree.operands[currentIndex] = {
+                    operation: mathOperator.operation,
+                    operands
+                }
+                operands.forEach((operand, index) => {
+                    if (this.codeContainsOperator(operand)) {
+                        this.keepDecomposing(operand, index, currentIndex);
+                    }
+                });
+            } else if (parentIndex !== undefined && currentIndex !== undefined) {
+                this.complexExpressionTree.operands[parentIndex].operands[currentIndex] = {
+                    operation: mathOperator.operation,
+                    operands
+                }
+                operands.forEach((operand, index) => {
+                    if (this.codeContainsOperator(operand)) {
+                        this.keepDecomposing(operand, index, parentIndex);
+                    }
+                });
+            }
+        }
+    */
+
+    /*
+        private constructJSLine(conditionExpression: ConditionExpression, compareExpression: CompareExpression, decomposedLeft: BaseToken, decomposedRight: BaseToken): string {
+            const leftExpression = this.constructExpression(decomposedLeft);
+            const rightExpression = this.constructExpression(decomposedRight);
+            let constructedLine = '';
+            if (conditionExpression.condition === 'if') {
+                constructedLine = `${conditionExpression.condition}(${leftExpression}${compareExpression.comparator}${rightExpression})`;
+            } else if (conditionExpression.condition === 'then') {
+                constructedLine = `{${leftExpression}${compareExpression.comparator}${rightExpression}}`;
+            } else if (conditionExpression.condition === 'else') {
+                constructedLine = `${conditionExpression.condition}{${leftExpression}${compareExpression.comparator}${rightExpression}}`;
+            }
+            return constructedLine;
+        }
+    */
+
+    /*
+        private constructExpression(exprTree: any): string {
+            let expr = '';
+            if (typeof exprTree === 'string') {
+                return expr = exprTree;
+            } else if (exprTree?.operands && exprTree.operands.every((operand: any) => {
+                return typeof operand === 'string';
+            })) {
+                return expr = `(${exprTree.operands.join(this.getJSOperator(exprTree.operation))})`;
+            } else if (exprTree?.operands) {
+                exprTree.operands.forEach((entry: any) => {
+                    const operatorNeeded = expr.length > 0 ? this.getJSOperator(exprTree.operation) : '';
+                    expr += operatorNeeded + this.constructExpression(entry);
+                });
+                return `(${expr})`;
+            }
+        }
+    */
 
     private getJSOperator(operation: string): string {
         return MathOperations[operation.toLowerCase()].jsOperator;
     }
 
-    private codeContainsOperator(codeLine: string): boolean {
-        const hasOperand = codeLine.includes(OperatorsList.PLUS) ||
-            codeLine.includes(OperatorsList.MINUS) ||
-            codeLine.includes(OperatorsList.MULT) ||
-            codeLine.includes(OperatorsList.DIVISION) ||
-            codeLine.includes(OperatorsList.POW);
-        return hasOperand;
-    }
-
-    private buildCondition(codeLine: string): ConditionExpression {
-        const conditionExpression = {
-            condition: '',
-            expression: ''
+    /*
+        private codeContainsOperator(codeLine: string): boolean {
+            const hasOperand = codeLine.includes(OperatorsList.PLUS) ||
+                codeLine.includes(OperatorsList.MINUS) ||
+                codeLine.includes(OperatorsList.MULT) ||
+                codeLine.includes(OperatorsList.DIVISION) ||
+                codeLine.includes(OperatorsList.POW);
+            return hasOperand;
         }
-        if (codeLine.includes(OperatorsList.IF)) {
-            conditionExpression.condition = 'if';
-            conditionExpression.expression = codeLine.substring(OperatorsList.IF.length); 
-        } else if (codeLine.includes(OperatorsList.ELSE)) {
-            conditionExpression.condition = 'else';
-            conditionExpression.expression = codeLine.substring(OperatorsList.ELSE.length); 
-        } else if (codeLine.includes(OperatorsList.THEN)) {
-            conditionExpression.condition = 'then';
-            conditionExpression.expression = codeLine.substring(OperatorsList.THEN.length); 
-        }
-        return conditionExpression;
-    }
+    */
 
-    private buildCompare(codeLine: ConditionExpression): CompareExpression {
-        const decomposedLine = {
-            comparator: '',
-            left: '',
-            right: ''
-        }
-
-        if (codeLine.expression.includes(OperatorsList.EQUALS)) {
-            if (codeLine.condition === 'if') {
-                decomposedLine.comparator = '===';
-            } else if (codeLine.condition === 'else' || codeLine.condition === 'then') {
-                decomposedLine.comparator = '=';
+    /*
+        private buildCondition(codeLine: string): ConditionExpression {
+            const conditionExpression = {
+                condition: '',
+                expression: ''
             }
-            decomposedLine.left = codeLine.expression.split(OperatorsList.EQUALS)[0]; 
-            decomposedLine.right = codeLine.expression.split(OperatorsList.EQUALS)[1]; 
-        } else if (codeLine.expression.includes(OperatorsList.LT)) {
-            decomposedLine.comparator = '<';
-            decomposedLine.left = codeLine.expression.split(OperatorsList.LT)[0]; 
-            decomposedLine.right = codeLine.expression.split(OperatorsList.LT)[1]; 
-        } else if (codeLine.expression.includes(OperatorsList.LTE)) {
-            decomposedLine.comparator = '<=';
-            decomposedLine.left = codeLine.expression.split(OperatorsList.LTE)[0]; 
-            decomposedLine.right = codeLine.expression.split(OperatorsList.LTE)[1]; 
-        } else if (codeLine.expression.includes(OperatorsList.GT)) {
-            decomposedLine.comparator = '>';
-            decomposedLine.left = codeLine.expression.split(OperatorsList.GT)[0]; 
-            decomposedLine.right = codeLine.expression.split(OperatorsList.GT)[1]; 
-        } else if (codeLine.expression.includes(OperatorsList.GTE)) {
-            decomposedLine.comparator = '>=';
-            decomposedLine.left = codeLine.expression.split(OperatorsList.GTE)[0]; 
-            decomposedLine.right = codeLine.expression.split(OperatorsList.GTE)[1]; 
+            if (codeLine.includes(OperatorsList.IF)) {
+                conditionExpression.condition = 'if';
+                conditionExpression.expression = codeLine.substring(OperatorsList.IF.length);
+            } else if (codeLine.includes(OperatorsList.ELSE)) {
+                conditionExpression.condition = 'else';
+                conditionExpression.expression = codeLine.substring(OperatorsList.ELSE.length);
+            } else if (codeLine.includes(OperatorsList.THEN)) {
+                conditionExpression.condition = 'then';
+                conditionExpression.expression = codeLine.substring(OperatorsList.THEN.length);
+            }
+            return conditionExpression;
         }
-        return decomposedLine;
-    }
+    */
 
-    private findOperands(lineWithoutSpaces: string, operator: string): string[] {
-        const tokens: string[] = [];
-        const arrayWithoutOperand = lineWithoutSpaces.split(operator);
-        arrayWithoutOperand.forEach((operand) => {
-            tokens.push(operand);
-        });
-        return tokens;
-    }
+    /*
+        private buildCompare(codeLine: ConditionExpression): CompareExpression {
+            const decomposedLine = {
+                comparator: '',
+                left: '',
+                right: ''
+            }
 
-    private callJSFunction(jsString: string): void {
-        console.log('STORED INPUT', this.storedInput);
-        const a = +this.storedInput[0];
-        const b = +this.storedInput[1];
-        const c = +this.storedInput[2];
-        const d = +this.storedInput[3];
-        const e = +this.storedInput[4];
-        const f = +this.storedInput[5];
-        const vars = `const a = ${a};const b = ${b};const c = ${c};const d = ${d};const e = ${e};const f = ${f};let x = undefined;`
-        const funcWithVars = vars.concat(jsString);
-        const funcWithFunc = `function calculateLuckyTicket(){${funcWithVars}return x}; calculateLuckyTicket();`
-        const calculatedValue = eval(funcWithFunc);
-        console.log('Calculated Value', calculatedValue);
-    }
+            if (codeLine.expression.includes(OperatorsList.EQUALS)) {
+                if (codeLine.condition === 'if') {
+                    decomposedLine.comparator = '===';
+                } else if (codeLine.condition === 'else' || codeLine.condition === 'then') {
+                    decomposedLine.comparator = '=';
+                }
+                decomposedLine.left = codeLine.expression.split(OperatorsList.EQUALS)[0];
+                decomposedLine.right = codeLine.expression.split(OperatorsList.EQUALS)[1];
+            } else if (codeLine.expression.includes(OperatorsList.LT)) {
+                decomposedLine.comparator = '<';
+                decomposedLine.left = codeLine.expression.split(OperatorsList.LT)[0];
+                decomposedLine.right = codeLine.expression.split(OperatorsList.LT)[1];
+            } else if (codeLine.expression.includes(OperatorsList.LTE)) {
+                decomposedLine.comparator = '<=';
+                decomposedLine.left = codeLine.expression.split(OperatorsList.LTE)[0];
+                decomposedLine.right = codeLine.expression.split(OperatorsList.LTE)[1];
+            } else if (codeLine.expression.includes(OperatorsList.GT)) {
+                decomposedLine.comparator = '>';
+                decomposedLine.left = codeLine.expression.split(OperatorsList.GT)[0];
+                decomposedLine.right = codeLine.expression.split(OperatorsList.GT)[1];
+            } else if (codeLine.expression.includes(OperatorsList.GTE)) {
+                decomposedLine.comparator = '>=';
+                decomposedLine.left = codeLine.expression.split(OperatorsList.GTE)[0];
+                decomposedLine.right = codeLine.expression.split(OperatorsList.GTE)[1];
+            }
+            return decomposedLine;
+        }
+    */
+
+    /*
+        private findOperands(lineWithoutSpaces: string, operator: string): string[] {
+            const tokens: string[] = [];
+            const arrayWithoutOperand = lineWithoutSpaces.split(operator);
+            arrayWithoutOperand.forEach((operand) => {
+                tokens.push(operand);
+            });
+            return tokens;
+        }
+    */
+
+    /*
+        private callJSFunction(jsString: string): void {
+            console.log('STORED INPUT', this.storedInput);
+            const a = +this.storedInput[0];
+            const b = +this.storedInput[1];
+            const c = +this.storedInput[2];
+            const d = +this.storedInput[3];
+            const e = +this.storedInput[4];
+            const f = +this.storedInput[5];
+            const vars = `const a = ${a};const b = ${b};const c = ${c};const d = ${d};const e = ${e};const f = ${f};let x = undefined;`
+            const funcWithVars = vars.concat(jsString);
+            const funcWithFunc = `function calculateLuckyTicket(){${funcWithVars}return x}; calculateLuckyTicket();`
+            const calculatedValue = eval(funcWithFunc);
+            console.log('Calculated Value', calculatedValue);
+        }
+    */
 
     parameters(): KioParameterDescription[] {
         return [
