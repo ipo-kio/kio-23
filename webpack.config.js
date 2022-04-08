@@ -36,7 +36,7 @@ module.exports = function (env) {
         module: {
             rules: [
                 {
-                    test: /\.js$/,
+                    test: /\.jsx?$/,
                     exclude: /node_modules/,
                     include: sourceFolders,
                     use: {
@@ -49,7 +49,8 @@ module.exports = function (env) {
                                         "ie": "11"
                                     },
                                     "corejs": 3
-                                }]
+                                }],
+                                "@babel/preset-react"
                             ],
                             "plugins": [
                                 "@babel/plugin-transform-arrow-functions",
@@ -62,7 +63,7 @@ module.exports = function (env) {
                     }
                 },
                 {
-                    test: /\.scss$/,
+                    test: /\.s?css$/,
                     use: [
                         MiniCssExtractPlugin.loader, //TODO remove empty main (with javascript)
                         {
@@ -156,6 +157,13 @@ function add_task_to_config(task_name, config, task_html_template, dist_folder) 
     let task_file_js = path.join(task_name, task_name + '.js');
     let task_file_ts = path.join(task_name, task_name + '.ts');
     config.entry[task_name] = fs.existsSync('tasks/' + task_file_ts) ? task_file_ts : task_file_js;
+
+    let task_file_parameters_js = path.join(task_name, task_name + '_parameters.js');
+    let task_file_parameters_ts = path.join(task_name, task_name + '_parameters.ts');
+    if (fs.existsSync('tasks/' + task_file_parameters_js))
+        config.entry[task_name + '_parameters'] = task_file_parameters_js;
+    else if (fs.existsSync('tasks/' + task_file_parameters_ts))
+        config.entry[task_name + '_parameters'] = task_file_parameters_ts;
 
     //copy html
     let output_html = process_html_template(task_html_template, task_name);

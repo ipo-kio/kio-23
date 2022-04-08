@@ -28,6 +28,7 @@
         else
             console.log("Wrong settings assignment: " + query[i]);
     }
+
     console.log("running tasks with the following settings: ", settings);
 
     document.getElementById('stud-unique-id').innerText = 'kio-task-[TASKNAME]-' + level;
@@ -35,7 +36,8 @@
     kio_api.initializeKioProblem(
         [TASKNAME].[TASKNAME|CAPITALIZE],
         document.getElementById('problem'),
-        settings
+        settings,
+        ''
     );
 </script>
 </body>
