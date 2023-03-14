@@ -111,14 +111,8 @@ export class Solitaire {
   parameters = function () {
     return [
       {
-        name: "progress",
-        title: "Беспорядки",
-        ordering: "minimize",
-        view: "",
-      },
-      {
         name: "length",
-        title: "Длинна перемещений",
+        title: "Длина перемещений",
         ordering: "minimize",
         view: "",
       },
@@ -190,7 +184,7 @@ export class Solitaire {
       const stats = {
         steps: solution.length - 1,
         length: statsHistory[statsHistory.length - 1]?.length || getDistanceBySolution(filterSolutions(solution)),
-        progress: getProgress(solution[solution.length - 1]),
+        // progress: getProgress(solution[solution.length - 1]),
         drops: getDropsBySolution(filterSolutions(solution)),
       };
 

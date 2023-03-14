@@ -11,12 +11,12 @@ export const Nav: FC = () => {
   const dispatch = useAppDispatch();
   const basePath = useAppSelector(s => s.user.basePath);
   return (
-    <nav className={clx(css.nav)}>
+    <div className={clx(css.nav)}>
       <ul className={clx(css.nav__list)}>
         <NavButton onClick={() => dispatch(restoreSnapshot())} title="Отменить действие">
-          <img src={`${basePath}/solitaire-resources/back.svg`} alt="Отменить действие" />
+          <img src={`${basePath}/solitaire-resources/back.svg`} className={clx(css.nav__img)} alt="Отменить действие" />
         </NavButton>
       </ul>
-    </nav>
+    </div>
   );
 };

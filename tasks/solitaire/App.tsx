@@ -32,11 +32,11 @@ export const App: FC<AppType> = () => {
 
   return (
     <Layout>
-      <header className={css.header}>
+      <div className={css.header}>
         <div className={css.header__wrapper}>
           <Nav />
         </div>
-      </header>
+      </div>
       <main className={css.main}>
         <Context cards={cards}>
           <Grid />

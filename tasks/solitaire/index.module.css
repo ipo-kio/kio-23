@@ -9,13 +9,13 @@
   justify-content: space-between;
   gap: 50px;
   margin: 0 auto;
-  padding: 30px 40px;
+  padding: 55px 40px;
 }
 .mapid {
   font-weight: 500;
 }
 .main {
-  padding-top: 35px;
+  padding-top: 95px;
   padding-bottom: 36px;
   background: var(--main-color);
 }
