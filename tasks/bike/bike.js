@@ -133,11 +133,13 @@ export class Bike {
 //      */
     loadSolution = function (solution) {
 
-        if (!solution) {
-            this.sceneRef.current.loadSolution(null)
-        }
+        setTimeout(() => {
+            if (!solution) {
+                this.sceneRef.current.loadSolution(null)
+            }
 
-        this.sceneRef.current.loadSolution(solution)
+            this.sceneRef.current.loadSolution(solution)
+        }, 300)
     };
 //
 }
